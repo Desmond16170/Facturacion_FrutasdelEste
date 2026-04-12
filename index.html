@@ -281,9 +281,9 @@ async function enviarPedido() {
 
   const total  = carrito.reduce((s,c) => s + c.precio * c.cantidad, 0);
   const lineas = carrito.map(i => `  • ${i.nombre} × ${i.cantidad} = ₡${(i.precio*i.cantidad).toLocaleString('es-CR')}`).join('\n');
-  const msg    = `🛒 *NUEVO PEDIDO — ${NEGOCIO}*\n\n👤 *Cliente:* ${nombre}\n` +
-    (direccion ? `📍 *Dirección:* ${direccion}\n` : '') +
-    `\n*Productos:*\n${lineas}\n\n💰 *TOTAL: ₡${total.toLocaleString('es-CR')}*\n\n_Pedido desde el catálogo online_`;
+  const msg    = ` *NUEVO PEDIDO — ${NEGOCIO}*\n\n *Cliente:* ${nombre}\n` +
+    (direccion ? ` *Dirección:* ${direccion}\n` : '') +
+    `\n*Productos:*\n${lineas}\n\n *TOTAL: ₡${total.toLocaleString('es-CR')}*\n\nPedido desde el catálogo online`;
 
   window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
 
