@@ -86,6 +86,15 @@ body { font-family:'DM Sans',sans-serif; background:var(--fondo); color:var(--te
 .prod-precio { font-weight:700; color:var(--verde); font-size:0.95rem; white-space:nowrap; }
 .tag { background:var(--verde-s); color:var(--verde-m); border-radius:99px; padding:1px 8px; font-size:0.68rem; font-weight:600; }
 .tag.galon { background:#fef9c3; color:#854d0e; }
+.tag.oferta { background:#fde8e8; color:#c0392b; }
+.tag.promo  { background:#fef3e2; color:#d97706; }
+.tag.agotado { background:#f3f4f6; color:var(--gris); }
+.toggles-row { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; padding:0.6rem 0; }
+.toggle-field { display:flex; align-items:center; gap:0.5rem; cursor:pointer; }
+.toggle-field input[type=checkbox] { width:18px; height:18px; accent-color:var(--verde); cursor:pointer; }
+.toggle-field label { font-size:0.82rem; font-weight:600; cursor:pointer; }
+.precio-oferta-wrap { display:none; }
+.precio-oferta-wrap.visible { display:block; }
 .prod-actions { display:flex; gap:0.4rem; }
 .btn-icon { width:32px; height:32px; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.85rem; transition:background 0.15s; }
 .btn-icon.delete { background:#fee2e2; color:var(--rojo); }
@@ -177,6 +186,16 @@ body { font-family:'DM Sans',sans-serif; background:var(--fondo); color:var(--te
           <div class="campo"><label>Emoji</label><input id="f-emoji" placeholder="🍓" maxlength="2"></div>
           <div class="campo full"><label>Descripción</label>
             <textarea id="f-desc" rows="2" placeholder="Pulpa natural sin conservantes..."></textarea>
+          </div>
+          <div class="campo full">
+            <div class="toggles-row">
+              <label class="toggle-field"><input type="checkbox" id="f-oferta"> <label for="f-oferta">🏷️ En oferta</label></label>
+              <label class="toggle-field"><input type="checkbox" id="f-promo"> <label for="f-promo">🎉 Promoción especial</label></label>
+              <label class="toggle-field"><input type="checkbox" id="f-agotado"> <label for="f-agotado">🚫 Agotado</label></label>
+            </div>
+            <div class="precio-oferta-wrap" id="precio-oferta-wrap">
+              <div class="campo"><label>Precio de oferta (₡)</label><input id="f-precio-oferta" type="number" placeholder="1800" min="0"></div>
+            </div>
           </div>
           <div class="campo full">
             <label>Foto <span style="font-weight:400;color:var(--gris)">(se comprime a WebP automáticamente)</span></label>
@@ -365,12 +384,16 @@ async function guardar() {
 
     const body = {
       nombre, precio,
-      categoria:   document.getElementById('f-cat').value,
-      unidad:      document.getElementById('f-unidad').value.trim(),
-      emoji:       document.getElementById('f-emoji').value.trim() || '🧃',
-      descripcion: document.getElementById('f-desc').value.trim(),
-      imagen_url:  imagen_url || (editId ? undefined : ''),
-      imagen_path
+      categoria:    document.getElementById('f-cat').value,
+      unidad:       document.getElementById('f-unidad').value.trim(),
+      emoji:        document.getElementById('f-emoji').value.trim() || '🧃',
+      descripcion:  document.getElementById('f-desc').value.trim(),
+      imagen_url:   imagen_url || (editId ? undefined : ''),
+      imagen_path,
+      en_oferta:    document.getElementById('f-oferta').checked,
+      precio_oferta: document.getElementById('f-precio-oferta').value ? parseFloat(document.getElementById('f-precio-oferta').value) : null,
+      es_promocion: document.getElementById('f-promo').checked,
+      agotado:      document.getElementById('f-agotado').checked
     };
 
     const url    = editId ? `/api/productos?id=${editId}` : '/api/productos';
@@ -389,12 +412,19 @@ async function guardar() {
   finally { btn.disabled = false; btn.textContent = '💾 Guardar Producto'; }
 }
 
+// Toggle precio-oferta input visibility
+document.getElementById('f-oferta').addEventListener('change', function() {
+  document.getElementById('precio-oferta-wrap').classList.toggle('visible', this.checked);
+});
+
 function blobToBase64(blob) {
   return new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(blob); });
 }
 
 function cancelar() {
-  ['f-nombre','f-precio','f-unidad','f-emoji','f-desc'].forEach(id => document.getElementById(id).value = '');
+  ['f-nombre','f-precio','f-unidad','f-emoji','f-desc','f-precio-oferta'].forEach(id => document.getElementById(id).value = '');
+  ['f-oferta','f-promo','f-agotado'].forEach(id => document.getElementById(id).checked = false);
+  document.getElementById('precio-oferta-wrap').classList.remove('visible');
   document.getElementById('f-cat').value = 'pulpa';
   document.getElementById('img-preview').style.display = 'none';
   document.getElementById('upload-placeholder').style.display = 'block';
@@ -412,6 +442,11 @@ function editar(id) {
   document.getElementById('f-unidad').value = p.unidad || '';
   document.getElementById('f-emoji').value  = p.emoji  || '';
   document.getElementById('f-desc').value   = p.descripcion || '';
+  document.getElementById('f-oferta').checked = !!p.en_oferta;
+  document.getElementById('f-promo').checked = !!p.es_promocion;
+  document.getElementById('f-agotado').checked = !!p.agotado;
+  document.getElementById('f-precio-oferta').value = p.precio_oferta || '';
+  document.getElementById('precio-oferta-wrap').classList.toggle('visible', !!p.en_oferta);
   editId = id; editImgPath = p.imagen_path || '';
   document.getElementById('form-titulo').textContent = '✏️ Editando: ' + p.nombre;
   if (p.imagen_url) {

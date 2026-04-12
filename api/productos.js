@@ -37,10 +37,12 @@ export default async function handler(req, res) {
 
   // POST — crear producto
   if (req.method === 'POST') {
-    const { nombre, precio, categoria, unidad, emoji, descripcion, imagen_url, imagen_path } = req.body;
+    const { nombre, precio, categoria, unidad, emoji, descripcion, imagen_url, imagen_path, en_oferta, precio_oferta, es_promocion, agotado } = req.body;
     if (!nombre || !precio) return res.status(400).json({ error: 'Faltan campos' });
     const { data, error } = await supabase.from('productos').insert([
-      { nombre, precio, categoria, unidad, emoji, descripcion, imagen_url, imagen_path }
+      { nombre, precio, categoria, unidad, emoji, descripcion, imagen_url, imagen_path,
+        en_oferta: !!en_oferta, precio_oferta: precio_oferta || null,
+        es_promocion: !!es_promocion, agotado: !!agotado }
     ]).select().single();
     if (error) return res.status(500).json({ error: error.message });
     return res.status(201).json(data);
@@ -50,9 +52,11 @@ export default async function handler(req, res) {
   if (req.method === 'PUT') {
     const { id } = req.query;
     if (!id) return res.status(400).json({ error: 'Falta id' });
-    const { nombre, precio, categoria, unidad, emoji, descripcion, imagen_url, imagen_path } = req.body;
+    const { nombre, precio, categoria, unidad, emoji, descripcion, imagen_url, imagen_path, en_oferta, precio_oferta, es_promocion, agotado } = req.body;
     const { data, error } = await supabase.from('productos').update(
-      { nombre, precio, categoria, unidad, emoji, descripcion, imagen_url, imagen_path }
+      { nombre, precio, categoria, unidad, emoji, descripcion, imagen_url, imagen_path,
+        en_oferta: !!en_oferta, precio_oferta: precio_oferta || null,
+        es_promocion: !!es_promocion, agotado: !!agotado }
     ).eq('id', id).select().single();
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json(data);
