@@ -127,26 +127,6 @@ body { font-family:'DM Sans',sans-serif; background:var(--fondo); color:var(--te
 #toast.error { background:var(--rojo); }
 
 @media (max-width:600px) { .form-grid { grid-template-columns:1fr; } .user-chip { display:none; } }
-
-/* LOGOS */
-.logos-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:0.75rem; }
-.logo-item { position:relative; border-radius:12px; overflow:hidden; border:2px solid #e5e7eb; background:var(--gris-s); aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:border-color 0.15s; }
-.logo-item:hover { border-color:var(--verde-c); }
-.logo-item img { width:100%; height:100%; object-fit:cover; display:block; }
-.logo-item .logo-nombre { font-size:0.62rem; font-weight:600; color:var(--gris); padding:4px 6px; text-align:center; word-break:break-all; background:white; width:100%; }
-.logo-item .btn-del-logo { position:absolute; top:5px; right:5px; background:var(--rojo); color:white; border:none; border-radius:50%; width:24px; height:24px; font-size:0.7rem; cursor:pointer; font-weight:800; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.25); transition:transform 0.15s; line-height:1; }
-.logo-item .btn-del-logo:hover { transform:scale(1.18); }
-.logo-upload-area { border:2px dashed #d1d5db; border-radius:12px; padding:1.1rem; text-align:center; cursor:pointer; transition:border-color 0.2s,background 0.2s; background:#fafafa; position:relative; margin-bottom:0.85rem; }
-.logo-upload-area:hover,.logo-upload-area.dragover { border-color:var(--verde-c); background:var(--verde-s); }
-.logo-upload-area input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; border:none; }
-.logo-upload-area p { font-size:0.8rem; color:var(--gris); margin-top:0.2rem; }
-#logo-preview-wrap { display:none; margin-bottom:0.6rem; text-align:center; }
-#logo-preview-wrap img { width:72px; height:72px; object-fit:cover; border-radius:10px; border:2px solid var(--verde-s); display:block; margin:0 auto 0.35rem; }
-#logo-preview-nombre { font-size:0.75rem; color:var(--verde-m); font-weight:600; }
-#logo-compress-info { font-size:0.7rem; color:var(--verde-c); text-align:center; display:none; margin-bottom:0.5rem; }
-.logo-form-row { display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; margin-bottom:0.85rem; }
-.logo-form-row input[type="text"] { flex:1; min-width:140px; border:2px solid #e5e7eb; border-radius:10px; padding:0.55rem 0.85rem; font-family:'DM Sans',sans-serif; font-size:0.88rem; outline:none; transition:border-color 0.2s; background:#fafafa; }
-.logo-form-row input:focus { border-color:var(--verde); background:white; }
 </style>
 </head>
 <body>
@@ -258,38 +238,6 @@ body { font-family:'DM Sans',sans-serif; background:var(--fondo); color:var(--te
       <div class="panel-body"><div id="pedidos-lista"><div class="empty-lista">Cargando...</div></div></div>
     </div>
 
-    <!-- LOGOS -->
-    <div class="panel">
-      <div class="panel-head">
-        <h2>🖼️ Logos del negocio</h2>
-        <span id="logos-count" style="font-size:0.8rem;color:var(--gris)"></span>
-      </div>
-      <div class="panel-body">
-        <div class="logo-upload-area" id="logo-upload-area"
-             ondragover="event.preventDefault();this.classList.add('dragover')"
-             ondragleave="this.classList.remove('dragover')"
-             ondrop="dropLogo(event)">
-          <input type="file" id="logo-input" accept="image/*" onchange="selLogo(this.files[0])">
-          <div style="font-size:1.6rem">🖼️</div>
-          <p><strong>Tocá o arrastrá</strong> un logo aquí</p>
-          <p>JPG, PNG — se comprime automáticamente a WebP</p>
-        </div>
-        <div id="logo-preview-wrap">
-          <img id="logo-preview-img" alt="preview">
-          <div id="logo-preview-nombre"></div>
-        </div>
-        <div id="logo-compress-info"></div>
-        <div class="logo-form-row" id="logo-form-row" style="display:none">
-          <input type="text" id="logo-nombre-input" placeholder="Nombre del logo (opcional)">
-          <button class="btn-guardar" id="btn-subir-logo" onclick="subirLogo()">⬆️ Subir logo</button>
-          <button class="btn-secondary" onclick="cancelarLogo()">Cancelar</button>
-        </div>
-        <div id="logos-grid" class="logos-grid">
-          <div class="empty-lista" style="grid-column:1/-1">Cargando logos…</div>
-        </div>
-      </div>
-    </div>
-
     <div class="panel">
       <div class="panel-head"><h2>📱 Compartir catálogo</h2></div>
       <div class="panel-body">
@@ -350,7 +298,6 @@ async function logout() { await sb.auth.signOut(); }
 async function iniciar() {
   await cargarProductos();
   await cargarPedidos();
-  await cargarLogos();
   generarQR();
 }
 
@@ -594,112 +541,6 @@ function toast(msg, err=false) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.className = 'visible' + (err?' error':'');
   clearTimeout(el._t); el._t = setTimeout(() => el.className = '', 3000);
-}
-
-// ── LOGOS ─────────────────────────────────
-let logoFile = null;
-
-async function cargarLogos() {
-  const grid = document.getElementById('logos-grid');
-  try {
-    const res   = await fetch('/api/logos', { headers: { Authorization: `Bearer ${sessionToken}` } });
-    const logos = res.ok ? await res.json() : [];
-    document.getElementById('logos-count').textContent = logos.length + ' logos';
-    if (!logos.length) {
-      grid.innerHTML = '<div class="empty-lista" style="grid-column:1/-1">No hay logos cargados todavía.</div>';
-      return;
-    }
-    grid.innerHTML = logos.map(l => `
-      <div class="logo-item" id="logo-item-${l.id}">
-        <img src="${l.url}" alt="${l.nombre || 'Logo'}">
-        ${l.nombre ? `<div class="logo-nombre">${l.nombre}</div>` : ''}
-        <button class="btn-del-logo" onclick="eliminarLogo('${l.id}','${l.path||''}')" title="Eliminar">✕</button>
-      </div>`).join('');
-  } catch {
-    grid.innerHTML = '<div class="empty-lista" style="grid-column:1/-1">Error al cargar logos.</div>';
-  }
-}
-
-function dropLogo(e) {
-  e.preventDefault();
-  document.getElementById('logo-upload-area').classList.remove('dragover');
-  const f = e.dataTransfer.files[0]; if (f) selLogo(f);
-}
-
-async function selLogo(file) {
-  const prev = document.getElementById('logo-preview-img');
-  prev.src   = URL.createObjectURL(file);
-  document.getElementById('logo-preview-wrap').style.display = 'block';
-  document.getElementById('logo-preview-nombre').textContent = file.name.replace(/\.[^.]+$/, '');
-  document.getElementById('logo-form-row').style.display     = 'flex';
-  document.getElementById('logo-nombre-input').value         = file.name.replace(/\.[^.]+$/, '');
-  try {
-    const blob = await comprimir(file, 400, 0.85);
-    logoFile   = blob;
-    const pct  = Math.round((1 - blob.size / file.size) * 100);
-    const info = document.getElementById('logo-compress-info');
-    info.style.display = 'block';
-    info.textContent   = `✅ ${Math.round(file.size/1024)} KB → ${Math.round(blob.size/1024)} KB (${pct}% menos) · WebP`;
-    prev.src = URL.createObjectURL(blob);
-  } catch { logoFile = file; }
-}
-
-async function subirLogo() {
-  if (!logoFile) { toast('⚠️ Seleccioná un logo primero', true); return; }
-  const btn    = document.getElementById('btn-subir-logo');
-  const nombre = document.getElementById('logo-nombre-input').value.trim();
-  btn.disabled = true; btn.textContent = '⏳ Subiendo...';
-  try {
-    const base64 = await blobToBase64(logoFile);
-    const upRes  = await fetch('/api/upload', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken}` },
-      body:    JSON.stringify({ base64: base64.split(',')[1], mimeType: 'image/webp', carpeta: 'logos' })
-    });
-    const upData = await upRes.json();
-    if (!upRes.ok) throw new Error(upData.error);
-
-    const saveRes = await fetch('/api/logos', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken}` },
-      body:    JSON.stringify({ url: upData.url, path: upData.path, nombre })
-    });
-    if (!saveRes.ok) { const d = await saveRes.json(); throw new Error(d.error); }
-
-    toast('✅ Logo subido correctamente');
-    cancelarLogo();
-    await cargarLogos();
-  } catch(e) { toast('❌ ' + e.message, true); }
-  finally { btn.disabled = false; btn.textContent = '⬆️ Subir logo'; }
-}
-
-function cancelarLogo() {
-  logoFile = null;
-  document.getElementById('logo-input').value              = '';
-  document.getElementById('logo-preview-wrap').style.display   = 'none';
-  document.getElementById('logo-form-row').style.display        = 'none';
-  document.getElementById('logo-compress-info').style.display   = 'none';
-  document.getElementById('logo-nombre-input').value            = '';
-}
-
-async function eliminarLogo(id, path) {
-  if (!confirm('¿Eliminar este logo? No se puede deshacer.')) return;
-  try {
-    const res = await fetch(`/api/logos/${id}`, {
-      method:  'DELETE',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken}` },
-      body:    JSON.stringify({ path })
-    });
-    if (res.ok) {
-      document.getElementById(`logo-item-${id}`)?.remove();
-      const grid = document.getElementById('logos-grid');
-      if (!grid.children.length)
-        grid.innerHTML = '<div class="empty-lista" style="grid-column:1/-1">No hay logos cargados todavía.</div>';
-      const countEl = document.getElementById('logos-count');
-      countEl.textContent = (parseInt(countEl.textContent) - 1) + ' logos';
-      toast('🗑️ Logo eliminado');
-    } else toast('❌ Error al eliminar', true);
-  } catch { toast('❌ Error de conexión', true); }
 }
 </script>
 </body>

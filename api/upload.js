@@ -1,8 +1,6 @@
 // api/upload.js
 // POST /api/upload  → recibe imagen como base64, la sube a Supabase Storage
 // Requiere auth token
-// Body: { base64, mimeType, carpeta? }
-//   carpeta: 'productos' (default) | 'logos'
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -24,17 +22,15 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: 'Token inválido' });
 
-  const { base64, mimeType, carpeta } = req.body;
+  const { base64, mimeType, fileName } = req.body;
   if (!base64) return res.status(400).json({ error: 'Falta imagen' });
 
-  // Carpeta destino: 'logos' o 'productos' (default)
-  const folder = carpeta === 'logos' ? 'logos' : 'productos';
-  const bucket = 'productos'; // mismo bucket, distinta subcarpeta
-  const buffer = Buffer.from(base64, 'base64');
-  const path   = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.webp`;
+  // Convertir base64 a Buffer
+  const buffer   = Buffer.from(base64, 'base64');
+  const path     = `productos/${Date.now()}_${Math.random().toString(36).slice(2)}.webp`;
 
   const { error: uploadError } = await supabase.storage
-    .from(bucket)
+    .from('productos')
     .upload(path, buffer, {
       contentType: 'image/webp',
       upsert: false,
@@ -44,10 +40,11 @@ export default async function handler(req, res) {
   if (uploadError) return res.status(500).json({ error: uploadError.message });
 
   const { data: { publicUrl } } = supabase.storage
-    .from(bucket)
+    .from('productos')
     .getPublicUrl(path);
 
   return res.status(200).json({ url: publicUrl, path });
 }
 
+// Necesario para recibir body grande (imágenes)
 export const config = { api: { bodyParser: { sizeLimit: '10mb' } } };
