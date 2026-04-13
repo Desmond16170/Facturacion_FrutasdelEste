@@ -128,7 +128,7 @@ main { max-width:960px; margin:0 auto; padding:0.5rem 1rem 8rem; }
 }
 
 /* ── SKELETON ── */
-.skeleton-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(165px,1fr)); gap:1rem; margin-top:1rem; }
+.skeleton-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:1rem; margin-top:1rem; }
 .skeleton-card { background:white; border-radius:var(--radio); overflow:hidden; }
 .sk { background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; }
 .sk-img  { height:130px; }
@@ -139,7 +139,7 @@ main { max-width:960px; margin:0 auto; padding:0.5rem 1rem 8rem; }
 @keyframes shimmer { to { background-position:-200% 0; } }
 
 /* ── GRID PRODUCTOS ── */
-.productos-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(165px,1fr)); gap:1rem; }
+.productos-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:1rem; }
 
 /* ── CARD ── */
 .card {
@@ -268,8 +268,9 @@ main { max-width:960px; margin:0 auto; padding:0.5rem 1rem 8rem; }
 .empty-state span { font-size:3rem; display:block; margin-bottom:1rem; }
 
 @media (max-width:480px) {
-  .productos-grid { grid-template-columns:repeat(2,1fr); gap:0.75rem; }
-  .card-body { padding:0.7rem; }
+  .productos-grid { grid-template-columns:repeat(2,1fr); gap:0.65rem; }
+  .card-body { padding:0.75rem; }
+  .card-nombre { font-size:0.9rem; }
   .card-desc { display:none; }
   .logo-circle { width:120px; height:120px; }
 }

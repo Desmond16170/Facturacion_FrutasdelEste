@@ -6,7 +6,25 @@
 <title>Admin — Frutas y Jugos del Este</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+async function limpiarEntregados() {
+  if (!confirm('¿Eliminar todos los pedidos marcados como entregados?')) return;
+  const pedidosEntregados = document.querySelectorAll('.pedido-entregado');
+  if (!pedidosEntregados.length) { toast('No hay pedidos entregados para limpiar', false); return; }
+  let count = 0;
+  for (const el of pedidosEntregados) {
+    const id = el.id.replace('pedido-', '');
+    try {
+      const res = await fetch(`/api/pedidos?id=${id}`, {
+        method: 'DELETE', headers: { Authorization: `Bearer ${sessionToken}` }
+      });
+      if (res.ok) count++;
+    } catch {}
+  }
+  toast(`🗑️ ${count} pedido(s) entregados eliminados`);
+  await cargarPedidos();
+}
+</script>
 <!-- Supabase JS para Auth solamente (no expone service key) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
@@ -112,7 +130,18 @@ body { font-family:'DM Sans',sans-serif; background:var(--fondo); color:var(--te
 .pedido-dir { font-size:0.78rem; color:var(--gris); margin-top:2px; }
 .pedido-items { font-size:0.8rem; margin:0.5rem 0; line-height:1.6; }
 .pedido-total { font-weight:700; color:var(--verde); }
-.badge-pendiente { background:#fef3c7; color:#92400e; font-size:0.68rem; font-weight:700; padding:3px 10px; border-radius:99px; text-transform:uppercase; }
+.badge-estado { font-size:0.68rem; font-weight:700; padding:3px 10px; border-radius:99px; text-transform:uppercase; white-space:nowrap; }
+.badge-pendiente { background:#fef3c7; color:#92400e; }
+.badge-entregado { background:#d1fae5; color:#065f46; }
+.badge-cancelado { background:#fee2e2; color:#991b1b; }
+.pedido-acciones { display:flex; gap:0.4rem; margin-top:0.6rem; flex-wrap:wrap; }
+.btn-entregar { background:#d1fae5; color:#065f46; border:none; border-radius:8px; padding:5px 12px; font-size:0.78rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.15s; }
+.btn-entregar:hover { background:#a7f3d0; }
+.btn-reabrir { background:#e0f2fe; color:#0369a1; border:none; border-radius:8px; padding:5px 12px; font-size:0.78rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.15s; }
+.btn-reabrir:hover { background:#bae6fd; }
+.btn-del-pedido { background:#fee2e2; color:var(--rojo); border:none; border-radius:8px; padding:5px 12px; font-size:0.78rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.15s; }
+.btn-del-pedido:hover { background:#fca5a5; }
+.pedido-entregado { opacity:0.65; background:#f9fafb; }
 
 /* QR */
 .qr-wrap { display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; }
@@ -251,9 +280,12 @@ body { font-family:'DM Sans',sans-serif; background:var(--fondo); color:var(--te
     </div>
 
     <div class="panel">
-      <div class="panel-head">
+      <div class="panel-head" style="flex-wrap:wrap;gap:0.5rem;">
         <h2>📋 Pedidos recientes</h2>
-        <span id="pedidos-count" style="font-size:0.8rem;color:var(--gris)"></span>
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+          <span id="pedidos-count" style="font-size:0.8rem;color:var(--gris)"></span>
+          <button class="btn-secondary" style="padding:4px 10px;font-size:0.75rem;" onclick="limpiarEntregados()">🧹 Limpiar entregados</button>
+        </div>
       </div>
       <div class="panel-body"><div id="pedidos-lista"><div class="empty-lista">Cargando...</div></div></div>
     </div>
@@ -545,28 +577,72 @@ function renderProductos() {
 
 function renderPedidos(pedidos) {
   const lista = document.getElementById('pedidos-lista');
-  document.getElementById('pedidos-count').textContent = (pedidos?.length || 0) + ' pedidos';
+  const pendientes = (pedidos||[]).filter(p => (p.estado||'pendiente') !== 'entregado').length;
+  document.getElementById('pedidos-count').textContent = (pedidos?.length || 0) + ' pedidos · ' + pendientes + ' pendientes';
   if (!pedidos?.length) { lista.innerHTML = '<div class="empty-lista">Aún no hay pedidos. 📭</div>'; return; }
   lista.innerHTML = pedidos.map(p => {
     const fecha = p.created_at
       ? new Date(p.created_at).toLocaleString('es-CR', { dateStyle:'short', timeStyle:'short' }) : '—';
     const items = (p.items||[]).map(i => `${i.nombre} × ${i.cantidad}`).join(', ');
+    const estado = p.estado || 'pendiente';
+    const entregado = estado === 'entregado';
     return `
-      <div class="pedido-card">
+      <div class="pedido-card${entregado ? ' pedido-entregado' : ''}" id="pedido-${p.id}">
         <div class="pedido-top">
           <div>
             <div class="pedido-cliente">👤 ${p.cliente}</div>
             ${p.direccion ? `<div class="pedido-dir">📍 ${p.direccion}</div>` : ''}
           </div>
-          <span class="badge-pendiente">${p.estado||'pendiente'}</span>
+          <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+            <span class="badge-estado badge-${estado}">${estadoLabel(estado)}</span>
+          </div>
         </div>
         <div class="pedido-items">${items}</div>
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.25rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.4rem;margin-top:0.5rem">
           <span class="pedido-total">💰 ₡${Number(p.total).toLocaleString('es-CR')}</span>
           <span class="pedido-fecha">${fecha}</span>
         </div>
+        <div class="pedido-acciones">
+          ${!entregado ? `<button class="btn-entregar" onclick="marcarEntregado('${p.id}')">✅ Marcar entregado</button>` : `<button class="btn-reabrir" onclick="cambiarEstado('${p.id}','pendiente')">↩️ Reabrir</button>`}
+          <button class="btn-del-pedido" onclick="eliminarPedido('${p.id}')">🗑️ Eliminar</button>
+        </div>
       </div>`;
   }).join('');
+}
+
+function estadoLabel(estado) {
+  const labels = { pendiente:'⏳ Pendiente', entregado:'✅ Entregado', cancelado:'❌ Cancelado' };
+  return labels[estado] || estado;
+}
+
+async function marcarEntregado(id) {
+  await cambiarEstado(id, 'entregado');
+}
+
+async function cambiarEstado(id, estado) {
+  try {
+    const res = await fetch(`/api/pedidos?id=${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken}` },
+      body: JSON.stringify({ estado })
+    });
+    if (!res.ok) throw new Error('Error al actualizar');
+    toast(estado === 'entregado' ? '✅ Pedido marcado como entregado' : '↩️ Pedido reabierto');
+    await cargarPedidos();
+  } catch(e) { toast('❌ ' + e.message, true); }
+}
+
+async function eliminarPedido(id) {
+  if (!confirm('¿Eliminar este pedido? No se puede deshacer.')) return;
+  try {
+    const res = await fetch(`/api/pedidos?id=${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${sessionToken}` }
+    });
+    if (!res.ok) throw new Error('Error al eliminar');
+    toast('🗑️ Pedido eliminado');
+    await cargarPedidos();
+  } catch(e) { toast('❌ ' + e.message, true); }
 }
 
 // ── QR ────────────────────────────────────
