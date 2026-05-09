@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin | Jugos y Frutas Del Este</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="assets/logo.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  </head>
+  <body class="admin-body" data-page="admin">
+    <aside class="admin-sidebar">
+      <a class="brand admin-brand" href="admin.html" aria-label="Panel Jugos y Frutas Del Este">
+        <img class="brand-logo-img" src="assets/logo.png" alt="" aria-hidden="true" />
+        <span>
+          <strong>Jugos y Frutas</strong>
+          <small>Admin</small>
+        </span>
+      </a>
+
+      <nav class="admin-nav" aria-label="Panel administrativo">
+        <button class="nav-item active" type="button" data-admin-page="dashboard">Dashboard</button>
+        <button class="nav-item" type="button" data-admin-page="products">Productos</button>
+        <button class="nav-item" type="button" data-admin-page="categories">Categorias</button>
+        <button class="nav-item" type="button" data-admin-page="excel">Excel</button>
+        <button id="logoutBtn" class="nav-item" type="button" hidden style="margin-top:auto;color:#c00;">Cerrar sesión</button>
+      </nav>
+
+      <div class="admin-sidebar-footer">
+        <span>Sesión protegida</span>
+        <p>Este panel requiere una sesión activa de Supabase Auth.</p>
+        <a href="index.html">Ver tienda</a>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div>
+          <span class="section-kicker">Panel administrativo</span>
+          <h1 id="adminPageTitle">Dashboard</h1>
+        </div>
+        <button class="btn-primary" type="button" id="newProductButton">Nuevo producto</button>
+      </header>
+
+      <section class="admin-page active" id="page-dashboard">
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="dashboard-grid">
+          <section class="panel-card">
+            <div class="panel-card-header">
+              <h2>Inventario bajo / por consultar</h2>
+              <span id="unavailableCountLabel">0 productos</span>
+            </div>
+            <div id="unavailableList" class="compact-list"></div>
+          </section>
+
+          <section class="panel-card">
+            <div class="panel-card-header">
+              <h2>Destacados</h2>
+              <span id="featuredCountLabel">0 productos</span>
+            </div>
+            <div id="featuredList" class="compact-list"></div>
+          </section>
+        </div>
+
+        <section class="panel-card">
+          <div class="panel-card-header">
+            <h2>Productos recientes</h2>
+            <button class="btn-muted" type="button" data-admin-page-shortcut="products">Ver todos</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Categoria</th>
+                  <th>Marca</th>
+                  <th>Estado</th>
+                  <th>Precio</th>
+                </tr>
+              </thead>
+              <tbody id="recentProductsBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="admin-page" id="page-products">
+        <div class="panel-card">
+          <div class="panel-card-header products-header">
+            <h2>Gestion de productos</h2>
+            <div class="admin-filters">
+              <input id="adminSearch" type="search" placeholder="Buscar producto" />
+              <select id="adminCategoryFilter"></select>
+              <select id="adminStatusFilter">
+                <option value="all">Todos</option>
+                <option value="available">Disponibles</option>
+                <option value="unavailable">No disponibles</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Categoria</th>
+                  <th>Marca</th>
+                  <th>Compatible</th>
+                  <th>Destacado</th>
+                  <th>Estado</th>
+                  <th>Precio</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-page" id="page-categories">
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2>Categorias</h2>
+            <button class="btn-primary" type="button" id="newCategoryButton">Nueva categoria</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Productos</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="categoriesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-page" id="page-excel">
+        <div class="excel-grid">
+          <section class="panel-card">
+            <div class="panel-card-header">
+              <h2>Exportar a Excel</h2>
+            </div>
+            <p class="panel-note">
+              Descarga el inventario completo con categorias, marcas,
+              compatibilidad, precio, estado y destacados.
+            </p>
+            <button class="btn-primary" type="button" id="exportExcelButton">Exportar .xlsx</button>
+          </section>
+
+          <section class="panel-card">
+            <div class="panel-card-header">
+              <h2>Importar desde Excel</h2>
+            </div>
+            <p class="panel-note">
+              Columnas aceptadas: nombre, descripcion, categoria, marca,
+              compatible, precio, disponible, destacado, codigo e imagen.
+            </p>
+            <input id="excelInput" type="file" accept=".xlsx,.xls,.csv" />
+            <button class="btn-muted" type="button" id="downloadTemplateButton">Descargar plantilla</button>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <dialog class="app-dialog" id="productDialog">
+      <form method="dialog" class="dialog-card" id="productForm">
+        <header>
+          <h2 id="productDialogTitle">Nuevo producto</h2>
+          <button class="icon-button" type="button" data-close-dialog="productDialog">x</button>
+        </header>
+
+        <input id="productId" type="hidden" />
+
+        <label class="image-field">
+          <span>Imagen</span>
+          <input id="imageInput" type="file" accept="image/*" />
+          <img id="imagePreview" alt="Vista previa" hidden />
+        </label>
+
+        <div class="form-grid">
+          <label>
+            Nombre *
+            <input id="nameInput" type="text" required />
+          </label>
+          <label>
+            Codigo / referencia
+            <input id="codeInput" type="text" />
+          </label>
+        </div>
+
+        <label>
+          Descripcion
+          <textarea id="descriptionInput" rows="3"></textarea>
+        </label>
+
+        <div class="form-grid">
+          <label>
+            Categoria *
+            <select id="categoryInput" required></select>
+          </label>
+          <label>
+            Marca del repuesto
+            <input id="brandInput" type="text" />
+          </label>
+        </div>
+
+        <label>
+          Compatible con
+          <input id="compatibleInput" type="text" placeholder="Toyota, Nissan, Hyundai" />
+        </label>
+
+        <div class="form-grid">
+          <label>
+            Precio *
+            <input id="priceInput" type="number" min="0" step="1" required />
+          </label>
+          <label>
+            Estado
+            <select id="availableInput">
+              <option value="true">Disponible</option>
+              <option value="false">No disponible</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="check-row">
+          <input id="featuredInput" type="checkbox" />
+          Producto destacado
+        </label>
+
+        <footer>
+          <button class="btn-muted" type="button" data-close-dialog="productDialog">Cancelar</button>
+          <button class="btn-primary" type="submit">Guardar producto</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog class="app-dialog" id="categoryDialog">
+      <form method="dialog" class="dialog-card small-dialog" id="categoryForm">
+        <header>
+          <h2>Nueva categoria</h2>
+          <button class="icon-button" type="button" data-close-dialog="categoryDialog">x</button>
+        </header>
+        <label>
+          Nombre
+          <input id="categoryNameInput" type="text" required />
+        </label>
+        <footer>
+          <button class="btn-muted" type="button" data-close-dialog="categoryDialog">Cancelar</button>
+          <button class="btn-primary" type="submit">Guardar</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="supabase.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

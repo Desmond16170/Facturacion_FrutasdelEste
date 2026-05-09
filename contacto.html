@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Contacto | Jugos y Frutas Del Este</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="assets/logo.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="contact">
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="index.html" aria-label="Jugos y Frutas Del Este">
+          <img class="brand-logo-img" src="assets/logo.png" alt="" aria-hidden="true" />
+          <span><strong>Jugos y Frutas</strong><small>Del Este</small></span>
+        </a>
+        <nav class="header-actions">
+          <a class="nav-link" href="index.html">Inicio</a>
+          <a class="nav-link" href="catalogo.html">Productos</a>
+          <a class="nav-link" href="nosotros.html">Nosotros</a>
+          <a class="nav-link active" href="contacto.html">Contacto</a>
+          <button class="cart-button" type="button" id="openCartButton" aria-label="Abrir carrito">
+            <svg class="cart-icon" viewBox="0 0 24 24"><path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 .01 0H17ZM4.2 4H2V2h3.8l.9 4H22l-2.2 8H8.1l.3 1.2c.1.5.5.8 1 .8H20v2H9.4c-1.4 0-2.6-1-2.9-2.3L4.2 4Zm3 4 .9 4h10.2l1.1-4H7.2Z" fill="currentColor"/></svg>
+            <span id="cartBadge">0</span>
+          </button>
+        </nav>
+        <button class="hamburger-btn" type="button" id="hamburgerBtn" aria-expanded="false" aria-controls="mobileNav" aria-label="Abrir menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <nav class="mobile-nav" id="mobileNav">
+      <a class="nav-link" href="index.html">Inicio</a>
+      <a class="nav-link" href="catalogo.html">Productos</a>
+      <a class="nav-link" href="nosotros.html">Nosotros</a>
+      <a class="nav-link active" href="contacto.html">Contacto</a>
+    </nav>
+
+    <main>
+      <section class="page-hero">
+        <span class="section-kicker">Contacto</span>
+        <h1>Pedidos y consultas, con gusto te atendemos.</h1>
+        <p>Escribenos por WhatsApp para hacer tu pedido, consultar precios o coordinar la entrega. También nos encontrás en redes sociales.</p>
+      </section>
+
+      <section class="contact-section">
+        <div class="contact-grid">
+          <article class="contact-card">
+            <span class="section-kicker">Comunicación</span>
+            <h2>Contacto directo</h2>
+            <div class="contact-links">
+              <a href="https://wa.me/50600000000" target="_blank" rel="noreferrer">
+                <strong>WhatsApp</strong>
+                <span>Pedidos y consultas rápidas</span>
+              </a>
+              <a href="tel:+50600000000">
+                <strong>Teléfono</strong>
+                <span>6000-0000</span>
+              </a>
+              <a href="mailto:jugosyfrutas@email.com">
+                <strong>Correo electrónico</strong>
+                <span>jugosyfrutas@email.com</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="contact-card">
+            <span class="section-kicker">Horario</span>
+            <h2>Atención</h2>
+            <div class="schedule-list">
+              <div>
+                <strong>Lunes a viernes</strong>
+                <span>7:00 am a 6:00 pm</span>
+              </div>
+              <div>
+                <strong>Sábados</strong>
+                <span>7:00 am a 3:00 pm</span>
+              </div>
+              <div>
+                <strong>Entrega</strong>
+                <span>Zona Este y GAM · Por encomienda</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="contact-card">
+            <span class="section-kicker">Redes sociales</span>
+            <h2>Seguinos</h2>
+            <div class="social-list">
+              <a href="#" target="_blank" rel="noreferrer">
+                <strong>Facebook</strong>
+                <span>Jugos y Frutas Del Este</span>
+              </a>
+              <a href="#" target="_blank" rel="noreferrer">
+                <strong>Instagram</strong>
+                <span>@jugosyfrutasdeleste</span>
+              </a>
+              <a href="https://wa.me/50600000000" target="_blank" rel="noreferrer">
+                <strong>WhatsApp</strong>
+                <span>Enviar mensaje</span>
+              </a>
+            </div>
+          </article>
+        </div>
+
+        <div class="map-card">
+          <div class="map-card-header">
+            <div>
+              <span class="section-kicker">Ubicación</span>
+              <h2>Visitanos</h2>
+            </div>
+            <a class="btn-secondary" href="https://maps.google.com" target="_blank" rel="noreferrer">Abrir en Google Maps</a>
+          </div>
+          <iframe
+            title="Ubicación de Jugos y Frutas Del Este"
+            src="https://www.google.com/maps?q=San+Jose+Costa+Rica&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer index-footer">
+      <div class="footer-bottom" style="margin:0; border-top:1px solid var(--line); padding-top:18px;">
+        <span>© 2025 Jugos y Frutas Del Este · Costa Rica</span>
+        <strong>100% Natural · Sin conservantes</strong>
+      </div>
+    </footer>
+
+    <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+      <button class="drawer-overlay" type="button" id="cartOverlay"></button>
+      <section class="drawer-panel">
+        <div class="drawer-header">
+          <div><span class="section-kicker">Pedido</span><h2 id="cartTitle">Tu carrito</h2></div>
+          <button class="icon-button" type="button" id="closeCartButton">✕</button>
+        </div>
+        <div class="drawer-body" id="cartBody"></div>
+        <div class="drawer-footer" id="cartFooter"></div>
+      </section>
+    </aside>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+    <script src="supabase.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

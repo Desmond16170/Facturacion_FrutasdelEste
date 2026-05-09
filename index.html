@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jugos y Frutas Del Este | Pulpas & Galones Naturales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="assets/logo.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="home">
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="index.html" aria-label="Jugos y Frutas Del Este">
+          <img class="brand-logo-img" src="assets/logo.png" alt="" aria-hidden="true" />
+          <span>
+            <strong>Jugos y Frutas</strong>
+            <small>Del Este</small>
+          </span>
+        </a>
+
+        <nav class="header-actions" aria-label="Acciones principales">
+          <a class="nav-link" href="index.html">Inicio</a>
+          <a class="nav-link" href="catalogo.html">Productos</a>
+          <a class="nav-link" href="nosotros.html">Nosotros</a>
+          <a class="nav-link" href="contacto.html">Contacto</a>
+          <button class="cart-button" type="button" id="openCartButton" aria-label="Abrir carrito">
+            <svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 .01 0H17ZM4.2 4H2V2h3.8l.9 4H22l-2.2 8H8.1l.3 1.2c.1.5.5.8 1 .8H20v2H9.4c-1.4 0-2.6-1-2.9-2.3L4.2 4Zm3 4 .9 4h10.2l1.1-4H7.2Z" fill="currentColor" />
+            </svg>
+            <span id="cartBadge">0</span>
+          </button>
+        </nav>
+
+        <button class="hamburger-btn" type="button" id="hamburgerBtn" aria-expanded="false" aria-controls="mobileNav" aria-label="Abrir menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+    <nav class="mobile-nav" id="mobileNav" aria-label="Menu movil">
+      <a class="nav-link" href="index.html">Inicio</a>
+      <a class="nav-link" href="catalogo.html">Productos</a>
+      <a class="nav-link" href="nosotros.html">Nosotros</a>
+      <a class="nav-link" href="contacto.html">Contacto</a>
+      <button class="cart-button" type="button" id="openCartButtonMobile" aria-label="Abrir carrito">
+        <svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 .01 0H17ZM4.2 4H2V2h3.8l.9 4H22l-2.2 8H8.1l.3 1.2c.1.5.5.8 1 .8H20v2H9.4c-1.4 0-2.6-1-2.9-2.3L4.2 4Zm3 4 .9 4h10.2l1.1-4H7.2Z" fill="currentColor" />
+        </svg>
+        <span id="cartBadgeMobile">0</span>
+      </button>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <span class="hero-tag">100% Natural · Costa Rica</span>
+          <h1>Pulpas congeladas y galones de frutas frescas.</h1>
+          <p>
+            Pulpas de fruta congeladas, galones de limón, maracuyá, cas y más sabores.
+            Pedidos por WhatsApp con entrega rápida.
+          </p>
+          <div class="hero-actions">
+            <a class="btn-primary" href="catalogo.html">Ver productos</a>
+            <a class="btn-secondary" href="https://wa.me/50600000000" target="_blank" rel="noreferrer">Pedir por WhatsApp</a>
+            <a class="btn-secondary" href="contacto.html">Contacto</a>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="Jugos y Frutas Del Este">
+          <div class="logo-card official-logo-card">
+            <img src="assets/logo.png" alt="Jugos y Frutas Del Este" />
+          </div>
+          <div class="shop-photo-card">
+            <span>Productos naturales</span>
+            <strong>Pulpas congeladas y galones frescos para tu hogar o negocio</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="trust-strip" aria-label="Informacion de servicio">
+        <div>
+          <small>Pedidos</small>
+          <strong>Lunes – Sábado</strong>
+          <span>Por WhatsApp o en local</span>
+        </div>
+        <div>
+          <small>Entrega</small>
+          <strong>Express y por encomienda</strong>
+          <span>Zona Este y Gran Área Metropolitana</span>
+        </div>
+        <div>
+          <small>Producto</small>
+          <strong>100% Natural, sin conservantes</strong>
+          <span>Frutas de temporada y todo el año</span>
+        </div>
+      </section>
+
+      <section class="brand-partners-section" aria-labelledby="saboresTitle">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">Sabores</span>
+            <h2 id="saboresTitle">Nuestros sabores disponibles</h2>
+          </div>
+          <p>Pulpas congeladas y galones en una amplia variedad de frutas tropicales y cítricas.</p>
+        </div>
+        <div class="sabores-grid">
+          <div class="sabor-card"><span class="sabor-emoji">🍋</span><span>Limón</span></div>
+          <div class="sabor-card"><span class="sabor-emoji">🌺</span><span>Maracuyá</span></div>
+          <div class="sabor-card"><span class="sabor-emoji">🍓</span><span>Fresa</span></div>
+          <div class="sabor-card"><span class="sabor-emoji">🥭</span><span>Mango</span></div>
+          <div class="sabor-card"><span class="sabor-emoji">🍍</span><span>Piña</span></div>
+          <div class="sabor-card"><span class="sabor-emoji">🍉</span><span>Sandía</span></div>
+          <div class="sabor-card"><span class="sabor-emoji">🥝</span><span>Cas</span></div>
+          <div class="sabor-card"><span class="sabor-emoji">🍊</span><span>Naranja</span></div>
+          <div class="sabor-card"><span class="sabor-emoji">🫐</span><span>Mora</span></div>
+          <div class="sabor-card"><span class="sabor-emoji">🍑</span><span>Melocotón</span></div>
+          <div class="sabor-card"><span class="sabor-emoji">🌴</span><span>Guanábana</span></div>
+          <div class="sabor-card"><span class="sabor-emoji">🍈</span><span>Guayaba</span></div>
+        </div>
+      </section>
+
+      <section class="home-link-section" aria-label="Secciones principales">
+        <a class="feature-link-card" href="catalogo.html">
+          <span class="section-kicker">Catálogo</span>
+          <strong>Pulpas congeladas y galones disponibles</strong>
+          <p>Filtra por tipo, sabor y presentación. Precios actualizados.</p>
+        </a>
+        <a class="feature-link-card" href="nosotros.html">
+          <span class="section-kicker">Nosotros</span>
+          <strong>Producto natural directo del productor</strong>
+          <p>Conoce nuestra historia y nuestro compromiso con la calidad.</p>
+        </a>
+      </section>
+    </main>
+
+    <footer class="site-footer index-footer" id="contacto">
+      <div class="footer-top footer-desktop-layout">
+        <div class="footer-brand-block">
+          <a class="brand footer-brand" href="index.html" aria-label="Jugos y Frutas Del Este">
+            <img class="brand-logo-img" src="assets/logo.png" alt="" aria-hidden="true" />
+            <span>
+              <strong>Jugos y Frutas</strong>
+              <small>Del Este</small>
+            </span>
+          </a>
+          <strong>Pulpas congeladas y galones 100% naturales</strong>
+        </div>
+
+        <nav class="footer-column" aria-label="Navegación">
+          <strong>Navegar</strong>
+          <a href="nosotros.html">Nosotros</a>
+          <a href="catalogo.html">Productos</a>
+          <a href="contacto.html">Contacto</a>
+        </nav>
+
+        <nav class="footer-column" aria-label="Contáctenos">
+          <strong>Contáctenos</strong>
+          <a href="https://wa.me/50600000000" target="_blank" rel="noreferrer">WhatsApp</a>
+          <a href="mailto:jugosyfrutas@email.com">Email</a>
+        </nav>
+
+        <nav class="footer-column" aria-label="Redes Sociales">
+          <strong>Redes Sociales</strong>
+          <a href="#" target="_blank" rel="noreferrer">Facebook</a>
+          <a href="#" target="_blank" rel="noreferrer">Instagram</a>
+        </nav>
+
+        <div class="footer-accepted">
+          <strong>Aceptamos</strong>
+          <div class="payment-row" aria-label="Métodos de pago">
+            <span>Sinpe</span>
+            <span>Transferencia</span>
+            <span>Efectivo</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile accordion footer -->
+      <div class="footer-top footer-accordion-layout footer-mobile-layout">
+        <div class="footer-brand-block">
+          <a class="brand footer-brand" href="index.html" aria-label="Jugos y Frutas Del Este">
+            <img class="brand-logo-img" src="assets/logo.png" alt="" aria-hidden="true" />
+            <span>
+              <strong>Jugos y Frutas</strong>
+              <small>Del Este</small>
+            </span>
+          </a>
+          <strong>Pulpas congeladas y galones 100% naturales</strong>
+        </div>
+        <details class="footer-group">
+          <summary><span>Navegar</span><span class="footer-chevron" aria-hidden="true">⌄</span></summary>
+          <nav class="footer-panel">
+            <a href="nosotros.html">Nosotros</a>
+            <a href="catalogo.html">Productos</a>
+            <a href="contacto.html">Contacto</a>
+          </nav>
+        </details>
+        <details class="footer-group">
+          <summary><span>Contáctenos</span><span class="footer-chevron" aria-hidden="true">⌄</span></summary>
+          <nav class="footer-panel">
+            <a href="https://wa.me/50600000000" target="_blank" rel="noreferrer">WhatsApp</a>
+            <a href="mailto:jugosyfrutas@email.com">jugosyfrutas@email.com</a>
+          </nav>
+        </details>
+        <details class="footer-group">
+          <summary><span>Redes Sociales</span><span class="footer-chevron" aria-hidden="true">⌄</span></summary>
+          <nav class="footer-panel">
+            <a href="#" target="_blank" rel="noreferrer">Facebook</a>
+            <a href="#" target="_blank" rel="noreferrer">Instagram</a>
+          </nav>
+        </details>
+        <details class="footer-group footer-payments-group">
+          <summary><span>Métodos de pago</span><span class="footer-chevron" aria-hidden="true">⌄</span></summary>
+          <div class="footer-panel footer-payment-panel">
+            <p>Aceptamos</p>
+            <div class="payment-row">
+              <span>Sinpe</span><span>Transferencia</span><span>Efectivo</span>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2025 Jugos y Frutas Del Este · Costa Rica</span>
+        <strong>100% Natural · Sin conservantes</strong>
+      </div>
+    </footer>
+
+    <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+      <button class="drawer-overlay" type="button" id="cartOverlay" aria-label="Cerrar carrito"></button>
+      <section class="drawer-panel" aria-labelledby="cartTitle">
+        <div class="drawer-header">
+          <div>
+            <span class="section-kicker">Pedido</span>
+            <h2 id="cartTitle">Tu carrito</h2>
+          </div>
+          <button class="icon-button" type="button" id="closeCartButton" aria-label="Cerrar carrito">✕</button>
+        </div>
+        <div class="drawer-body" id="cartBody"></div>
+        <div class="drawer-footer" id="cartFooter"></div>
+      </section>
+    </aside>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+    <script src="supabase.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

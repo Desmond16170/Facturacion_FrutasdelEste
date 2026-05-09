@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nosotros | Jugos y Frutas Del Este</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="assets/logo.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="about">
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="index.html" aria-label="Jugos y Frutas Del Este">
+          <img class="brand-logo-img" src="assets/logo.png" alt="" aria-hidden="true" />
+          <span><strong>Jugos y Frutas</strong><small>Del Este</small></span>
+        </a>
+        <nav class="header-actions">
+          <a class="nav-link" href="index.html">Inicio</a>
+          <a class="nav-link" href="catalogo.html">Productos</a>
+          <a class="nav-link active" href="nosotros.html">Nosotros</a>
+          <a class="nav-link" href="contacto.html">Contacto</a>
+          <button class="cart-button" type="button" id="openCartButton" aria-label="Abrir carrito">
+            <svg class="cart-icon" viewBox="0 0 24 24"><path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 .01 0H17ZM4.2 4H2V2h3.8l.9 4H22l-2.2 8H8.1l.3 1.2c.1.5.5.8 1 .8H20v2H9.4c-1.4 0-2.6-1-2.9-2.3L4.2 4Zm3 4 .9 4h10.2l1.1-4H7.2Z" fill="currentColor"/></svg>
+            <span id="cartBadge">0</span>
+          </button>
+        </nav>
+        <button class="hamburger-btn" type="button" id="hamburgerBtn" aria-expanded="false" aria-controls="mobileNav" aria-label="Abrir menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <nav class="mobile-nav" id="mobileNav">
+      <a class="nav-link" href="index.html">Inicio</a>
+      <a class="nav-link" href="catalogo.html">Productos</a>
+      <a class="nav-link active" href="nosotros.html">Nosotros</a>
+      <a class="nav-link" href="contacto.html">Contacto</a>
+    </nav>
+
+    <main>
+      <section class="page-hero">
+        <span class="section-kicker">Quiénes somos</span>
+        <h1>Jugos y Frutas Del Este</h1>
+        <p>Somos una empresa familiar costarricense dedicada a la producción y venta de pulpas de fruta congeladas y galones de jugo natural, sin conservantes ni aditivos artificiales.</p>
+      </section>
+
+      <section class="about-section">
+        <div class="about-copy">
+          <span class="section-kicker">Nuestra historia</span>
+          <h2>Fruta fresca, directo a tu mesa</h2>
+          <p>Nacimos de la pasión por los sabores naturales de Costa Rica. Seleccionamos las mejores frutas de temporada y las procesamos con los más altos estándares de higiene para ofrecerte un producto fresco, natural y lleno de sabor.</p>
+          <p>Nuestras pulpas congeladas conservan todos los nutrientes y el sabor original de la fruta, sin colorantes ni conservantes. Perfectas para jugos, batidos, postres y helados en tu hogar o negocio.</p>
+          <a class="btn-primary" href="catalogo.html" style="margin-top:8px; display:inline-flex;">Ver productos</a>
+        </div>
+
+        <div class="about-grid">
+          <article>
+            <span class="section-kicker">Calidad</span>
+            <strong>100% Natural</strong>
+            <span>Sin conservantes, colorantes ni aditivos artificiales. Sólo fruta.</span>
+          </article>
+          <article>
+            <span class="section-kicker">Variedad</span>
+            <strong>+12 sabores disponibles</strong>
+            <span>Limón, maracuyá, fresa, mango, cas, mora y muchos más.</span>
+          </article>
+          <article>
+            <span class="section-kicker">Presentaciones</span>
+            <strong>Pulpa congelada y galones</strong>
+            <span>Para el hogar, sodas, restaurantes, heladerías y hoteles.</span>
+          </article>
+          <article>
+            <span class="section-kicker">Entrega</span>
+            <strong>Zona Este y GAM</strong>
+            <span>Entrega express o por encomienda. Pedidos por WhatsApp.</span>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer index-footer">
+      <div class="footer-bottom" style="margin:0; border-top:1px solid var(--line); padding-top:18px;">
+        <span>© 2025 Jugos y Frutas Del Este · Costa Rica</span>
+        <strong>100% Natural · Sin conservantes</strong>
+      </div>
+    </footer>
+
+    <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+      <button class="drawer-overlay" type="button" id="cartOverlay"></button>
+      <section class="drawer-panel">
+        <div class="drawer-header">
+          <div><span class="section-kicker">Pedido</span><h2 id="cartTitle">Tu carrito</h2></div>
+          <button class="icon-button" type="button" id="closeCartButton">✕</button>
+        </div>
+        <div class="drawer-body" id="cartBody"></div>
+        <div class="drawer-footer" id="cartFooter"></div>
+      </section>
+    </aside>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+    <script src="supabase.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

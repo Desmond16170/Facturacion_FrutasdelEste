@@ -1,85 +1,34 @@
-# Frutas y Jugos del Este 🧃
+# Jugos y Frutas Del Este — Sitio Web
 
-Catálogo online con panel de administración. Desplegado en Vercel + Supabase.
+Proyecto web adaptado de Herrera Auto Partes para venta de pulpas congeladas y galones de jugo.
 
-## Variables de entorno (Vercel)
+## Archivos principales
+- `index.html` — Página de inicio
+- `catalogo.html` — Catálogo de productos
+- `nosotros.html` — Página de nosotros
+- `contacto.html` — Contacto y ubicación
+- `producto.html` — Detalle de producto individual
+- `admin.html` — Panel de administración
+- `login.html` — Login del administrador
+- `styles.css` — Estilos con paleta verde/rojo del logo
+- `app.js` — Lógica de la tienda
+- `supabase.js` — Configuración de Supabase (debes completar)
 
-```
-SUPABASE_URL=https://xxxxxxxx.supabase.co
-SUPABASE_SERVICE_KEY=tu_service_role_key
-```
+## Qué personalizar
 
-## Tablas requeridas en Supabase
+1. **supabase.js** — Cambiá `SUPABASE_URL` y `SUPABASE_ANON_KEY` por tus credenciales
+2. **app.js línea 4** — Cambiá `WA_NUMBER` por tu número de WhatsApp real (`506XXXXXXXX`)
+3. **contacto.html** — Actualizá teléfono, email, redes y embed del mapa
+4. **index.html** — Actualizá el link de WhatsApp en los botones hero
+5. **assets/logo.png** — Logo ya copiado del original
 
-### productos
-```sql
-create table productos (
-  id          uuid primary key default gen_random_uuid(),
-  created_at  timestamptz default now(),
-  nombre      text not null,
-  precio      numeric not null,
-  categoria   text,
-  unidad      text,
-  emoji       text,
-  descripcion text,
-  imagen_url  text,
-  imagen_path text,
-  en_oferta   boolean default false,
-  precio_oferta numeric,
-  es_promocion boolean default false,
-  agotado     boolean default false
-);
-```
+## Páginas eliminadas vs original
+- ❌ `cita.html` — Eliminada (no aplica para este negocio)
+- ❌ `servicios.html` — Eliminada (reemplazada por `nosotros.html`)
+- ❌ `categorias.html` — No incluida (no necesaria)
 
-### pedidos
-```sql
-create table pedidos (
-  id         uuid primary key default gen_random_uuid(),
-  created_at timestamptz default now(),
-  cliente    text not null,
-  direccion  text,
-  items      jsonb,
-  total      numeric,
-  estado     text default 'pendiente'
-);
-```
-
-### logos
-```sql
-create table logos (
-  id         uuid primary key default gen_random_uuid(),
-  created_at timestamptz default now(),
-  url        text not null,
-  path       text,
-  nombre     text
-);
-```
-
-## Storage en Supabase
-
-Crear un bucket llamado **`productos`** (público).  
-Las imágenes de productos se guardan en la subcarpeta `productos/`  
-Los logos se guardan en la subcarpeta `logos/`
-
-## Estructura del proyecto
-
-```
-/
-├── index.html          → Catálogo público
-├── admin/
-│   └── index.html      → Panel de administración (requiere login)
-├── api/
-│   ├── productos.js    → CRUD de productos
-│   ├── pedidos.js      → CRUD de pedidos
-│   ├── upload.js       → Subida de imágenes a Storage
-│   └── logos.js        → CRUD de logos
-├── vercel.json
-└── package.json
-```
-
-## Deploy
-
-1. Fork o subí el repo a GitHub
-2. Importalo en [vercel.com](https://vercel.com)
-3. Agregá las variables de entorno
-4. Creá el usuario admin en Supabase → Authentication → Users → Invite user
+## Paleta de colores (del logo)
+- Verde principal: `#2a7a3b`
+- Rojo acento: `#e63328`
+- Amarillo/naranja: `#f5a623`
+- Fondo oscuro verde: `#081a0e`
