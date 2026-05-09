@@ -269,7 +269,7 @@ const CATEGORY_STOCK_IMAGES = {};
       // Sanitizar: escapar % y _ para evitar abuso de wildcards en ilike
       const safeSearch = search.replace(/%/g, "\\%").replace(/_/g, "\\_").slice(0, 100);
       query = query.or(
-        `name.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%,code.ilike.%${safeSearch}%,compatible_with.ilike.%${safeSearch}%`
+        `name.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%,code.ilike.%${safeSearch}%`
       );
     }
 
@@ -564,8 +564,7 @@ const CATEGORY_STOCK_IMAGES = {};
     body.appendChild(el("h3", "", product.name));
     body.appendChild(el("p", "product-description", product.description || "Descripcion pendiente."));
     const meta = el("div", "product-meta");
-    meta.appendChild(el("span", "", `Compatible: ${product.compatibleWith || "Consultar"}`));
-    if (product.code) meta.appendChild(el("span", "", `Referencia: ${product.code}`));
+    if (product.code) meta.appendChild(el("span", "", `Ref: ${product.code}`));
     body.appendChild(meta);
     const footer = el("div", "product-footer");
     footer.appendChild(el("strong", "price", formatMoney(product.price)));
@@ -707,7 +706,7 @@ const CATEGORY_STOCK_IMAGES = {};
 
     const specs = el("div", "product-detail-specs");
     specs.appendChild(detailSpec("Precio", formatMoney(product.price)));
-    specs.appendChild(detailSpec("Compatible con", product.compatibleWith || "Consultar"));
+    if (product.brand) specs.appendChild(detailSpec("Presentación", product.brand));
     specs.appendChild(detailSpec("Referencia", product.code || "No indicada"));
     specs.appendChild(detailSpec("Estado", product.available ? "Disponible" : "Por consultar"));
     info.appendChild(specs);
@@ -767,7 +766,7 @@ const CATEGORY_STOCK_IMAGES = {};
       "",
       `Producto: ${product.name}`,
       `Precio visto: ${formatMoney(product.price)}`,
-      `Compatible con: ${product.compatibleWith || "Consultar"}`,
+      `Presentación: ${product.brand || "Ver en tienda"}`,
       `Referencia: ${product.code || "No indicada"}`,
       "",
       "¿Me pueden confirmar disponibilidad y detalles?"
@@ -807,8 +806,8 @@ const CATEGORY_STOCK_IMAGES = {};
     const availability = byId("availabilityFilter")?.value;
     if (search) filters.push(`Busqueda: ${search}`);
     if (category   && category   !== "all") filters.push(category);
-    if (brand      && brand      !== "all") filters.push(`Marca: ${brand}`);
-    if (compatible && compatible !== "all") filters.push(`Compatible: ${compatible}`);
+    if (brand      && brand      !== "all") filters.push(`Sabor: ${brand}`);
+    if (compatible && compatible !== "all") filters.push(`Presentación: ${compatible}`);
     if (availability === "available")   filters.push("Disponibles");
     if (availability === "unavailable") filters.push("No disponibles");
     row.replaceChildren(...filters.map(f => tag(f)));
@@ -896,7 +895,7 @@ const CATEGORY_STOCK_IMAGES = {};
     else { item.appendChild(el("div", "cart-line-placeholder")); }
     const info = el("div");
     info.appendChild(el("h3", "", line.name));
-    info.appendChild(el("p", "", `${line.available ? "Disponible" : "Por consultar"} / ${line.brand || "Sin marca"}`));
+    info.appendChild(el("p", "", `${line.available ? "Disponible" : "Por consultar"} / ${line.brand || "Sin presentación"}`));
     const qty = el("div", "qty-row");
     const minus = el("button","","-"); const plus = el("button","","+");
     minus.type = plus.type = "button";
@@ -927,7 +926,7 @@ const CATEGORY_STOCK_IMAGES = {};
     const lines = state.cart.map(l => { const p = state.products.find(x => x.id === l.id); return p ? { ...p, qty: l.qty } : null; }).filter(Boolean);
     if (!lines.length) return;
     const total   = lines.reduce((s, l) => s + l.price * l.qty, 0);
-    const detail  = lines.map(l => `- ${l.qty} x ${l.name} (${l.brand || "Sin marca"}) - ${l.available ? "Disponible" : "Solicitar disponibilidad"} - ${formatMoney(l.price * l.qty)}`).join("\n");
+    const detail  = lines.map(l => `- ${l.qty} x ${l.name} (${l.brand || "Sin presentación"}) - ${l.available ? "Disponible" : "Solicitar disponibilidad"} - ${formatMoney(l.price * l.qty)}`).join("\n");
     const message = `Hola, quisiera solicitar una cotizacion en Herrera Auto Partes:\n\n${detail}\n\nTotal estimado: ${formatMoney(total)}\n\nPor favor confirmar disponibilidad y precio final.`;
     window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
   }
@@ -1026,7 +1025,7 @@ const CATEGORY_STOCK_IMAGES = {};
     list.replaceChildren(...products.map(p => {
       const item = el("div","compact-item");
       const text = el("div");
-      text.append(el("strong","",p.name), el("span","",`${p.category} / ${p.brand || "Sin marca"}`));
+      text.append(el("strong","",p.name), el("span","",`${p.category} / ${p.brand || "Sin presentación"}`));
       item.append(text, statusPill(p.available));
       return item;
     }));
@@ -1047,7 +1046,7 @@ const CATEGORY_STOCK_IMAGES = {};
     const category = byId("adminCategoryFilter")?.value || "all";
     const status   = byId("adminStatusFilter")?.value || "all";
     const products = state.products.filter(p => {
-      const ok_search   = !search || [p.name,p.code,p.brand,p.category,p.compatibleWith].join(" ").toLowerCase().includes(search);
+      const ok_search   = !search || [p.name,p.code,p.brand,p.category].join(" ").toLowerCase().includes(search);
       const ok_category = category === "all" || p.category === category;
       const ok_status   = status   === "all" || (status === "available" && p.available) || (status === "unavailable" && !p.available);
       return ok_search && ok_category && ok_status;
@@ -1067,7 +1066,7 @@ const CATEGORY_STOCK_IMAGES = {};
     productCell.appendChild(productWrap);
     row.append(productCell, td(product.category||"-"), td(product.brand||"-"));
     if (!withActions) { row.append(tdNode(statusPill(product.available)), td(formatMoney(product.price))); return row; }
-    row.append(td(product.compatibleWith||"-"), td(product.featured?"Si":"No"), tdNode(statusPill(product.available)), td(formatMoney(product.price)));
+    row.append(td(product.featured?"Si":"No"), tdNode(statusPill(product.available)), td(formatMoney(product.price)));
     const actions = el("td"); const wrap = el("div","table-actions");
     const edit   = el("button","","Editar");
     const toggle = el("button","", product.available ? "Marcar no disponible" : "Marcar disponible");
@@ -1118,8 +1117,9 @@ const CATEGORY_STOCK_IMAGES = {};
     byId("nameInput").value          = product?.name || "";
     byId("codeInput").value          = product?.code || "";
     byId("descriptionInput").value   = product?.description || "";
-    byId("brandInput").value         = product?.brand || "";
-    byId("compatibleInput").value    = product?.compatibleWith || "";
+    
+    
+    byId("presentationInput").value  = product?.brand || "";
     byId("priceInput").value         = product?.price || "";
     byId("availableInput").value     = String(product?.available ?? true);
     byId("featuredInput").checked    = Boolean(product?.featured);
@@ -1146,7 +1146,7 @@ const CATEGORY_STOCK_IMAGES = {};
       const product = {
         id, name: clean(byId("nameInput").value), code: clean(byId("codeInput").value),
         description: clean(byId("descriptionInput").value), category,
-        brand: clean(byId("brandInput").value), compatibleWith: clean(byId("compatibleInput").value),
+        brand: clean(byId("presentationInput").value), compatibleWith: "",
         price: Number(byId("priceInput").value || 0), image: imageUrl,
         available: byId("availableInput").value === "true", featured: byId("featuredInput").checked,
         createdAt: existing?.createdAt || now, updatedAt: now,
@@ -1235,7 +1235,7 @@ const CATEGORY_STOCK_IMAGES = {};
   }
 
   function downloadExcelTemplate() {
-    const rows = [{ Nombre:"Filtro de aceite premium", Descripcion:"Filtro sellado para motor", Categoria:"Filtros", Marca:"Bosch", Compatible:"Toyota, Nissan", Precio:9500, Disponible:"Si", Destacado:"Si", Codigo:"HF-001", Imagen:"" }];
+    const rows = [{ Nombre:"Pulpa de Maracuyá 1 Kg", Descripcion:"Pulpa congelada 100% natural sin conservantes", Categoria:"Pulpas congeladas", Marca:"Pulpa 1 Kg", Precio:2500, Disponible:"Si", Destacado:"Si", Codigo:"PUL-MARA-1KG", Imagen:"" }];
     if (window.XLSX) { const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Productos"); XLSX.writeFile(wb, "plantilla-herrera-productos.xlsx"); return; }
     downloadText(toCsv(rows), "plantilla-herrera-productos.csv", "text/csv");
   }

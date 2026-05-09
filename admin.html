@@ -80,7 +80,7 @@
                 <tr>
                   <th>Producto</th>
                   <th>Categoria</th>
-                  <th>Marca</th>
+                  <th>Presentación</th>
                   <th>Estado</th>
                   <th>Precio</th>
                 </tr>
@@ -111,8 +111,7 @@
                 <tr>
                   <th>Producto</th>
                   <th>Categoria</th>
-                  <th>Marca</th>
-                  <th>Compatible</th>
+                  <th>Presentación</th>
                   <th>Destacado</th>
                   <th>Estado</th>
                   <th>Precio</th>
@@ -153,8 +152,8 @@
               <h2>Exportar a Excel</h2>
             </div>
             <p class="panel-note">
-              Descarga el inventario completo con categorias, marcas,
-              compatibilidad, precio, estado y destacados.
+              Descarga el inventario completo con categorias, presentación,
+              precio, estado y destacados.
             </p>
             <button class="btn-primary" type="button" id="exportExcelButton">Exportar .xlsx</button>
           </section>
@@ -164,8 +163,8 @@
               <h2>Importar desde Excel</h2>
             </div>
             <p class="panel-note">
-              Columnas aceptadas: nombre, descripcion, categoria, marca,
-              compatible, precio, disponible, destacado, codigo e imagen.
+              Columnas aceptadas: nombre, descripcion, categoria, presentacion,
+              precio, disponible, destacado, codigo e imagen.
             </p>
             <input id="excelInput" type="file" accept=".xlsx,.xls,.csv" />
             <button class="btn-muted" type="button" id="downloadTemplateButton">Descargar plantilla</button>
@@ -211,15 +210,20 @@
             <select id="categoryInput" required></select>
           </label>
           <label>
-            Marca del repuesto
-            <input id="brandInput" type="text" />
+            Presentación
+            <select id="presentationInput">
+              <option value="">— Seleccionar —</option>
+              <option value="Pulpa 400 g">Pulpa 400 g</option>
+              <option value="Pulpa 1 Kg">Pulpa 1 Kg</option>
+              <option value="Pulpa 2 Kg">Pulpa 2 Kg</option>
+              <option value="Galón">Galón</option>
+              <option value="Medio galón">Medio galón</option>
+              <option value="Botella 1 L">Botella 1 L</option>
+              <option value="Combo">Combo</option>
+              <option value="Otro">Otro</option>
+            </select>
           </label>
         </div>
-
-        <label>
-          Compatible con
-          <input id="compatibleInput" type="text" placeholder="Toyota, Nissan, Hyundai" />
-        </label>
 
         <div class="form-grid">
           <label>
