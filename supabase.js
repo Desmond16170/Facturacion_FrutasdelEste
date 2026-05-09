@@ -8,8 +8,8 @@
  * policies en tu proyecto Supabase.
  */
 (function () {
-  const SUPABASE_URL      = "https://vitgihkyegoytpnbciqq.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_ityXUAS1jMmTMZf4HTlm-w_KYfxqExf";
+  const SUPABASE_URL      = "https://ghbhqutmqtvlmlcqvvgl.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_i_jR2c_HsUJg3Vq3mBbNJg_45R5VBFM";
 
   if (typeof supabase === "undefined") {
     console.error("Supabase CDN no cargado.");
@@ -23,7 +23,7 @@
       detectSessionInUrl: false,
     },
     global: {
-      headers: { "x-client-info": "herrera-auto-partes/2.0" },
+      headers: { "x-client-info": "frutayjugosdeleste/2.0" },
     },
   });
 })();

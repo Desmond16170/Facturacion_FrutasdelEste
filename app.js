@@ -1,7 +1,7 @@
 (function () {
   // ─── CONSTANTES ─────────────────────────────────────────────────────────────
   const CART_KEY       = "jf_cart";
-  const WA_NUMBER      = "50600000000";
+  const WA_NUMBER      = "50662253122";
   // Imágenes: se suben a Cloudinary vía /api/upload-image (ver api/upload-image.js)
 
   const defaultCategories = [
@@ -11,65 +11,7 @@
 
   // ─── IMÁGENES STOCK POR CATEGORÍA ────────────────────────────────────────────
   // Mapa: nombre de categoría (en minúsculas sin tildes) → ruta del SVG stock
-const CATEGORY_STOCK_IMAGES = {
-  "bobinas": "assets/categorias/bobina.png",
-  "bocinas_bujes": "assets/categorias/bocina.png",
-  "bomba_auxiliar_de_freno": "assets/categorias/bomba_aux_freno.png",
-  "bomba_auxiliar_de_clutch": "assets/categorias/bomba_auxiliar_clutch.png",
-  "bomba_de_agua": "assets/categorias/bomba_de_agua.png",
-  "bomba_principal_de_clutch": "assets/categorias/bomba_principal_clutch.png",
-  "bomba_principal_de_freno": "assets/categorias/bomba_principal_freno.png",
-  "botas_de_eje": "assets/categorias/bota_eje.png",
-  "bujias": "assets/categorias/Bujias.png",
-  "bushing": "assets/categorias/bushing.png",
-  "bushing_de_hule_metalico": "assets/categorias/bushing_hule_metal.png",
-  "bushing_punta_tijereta": "assets/categorias/bushing_punta_tijereta.png",
-  "cables_de_bobina": "assets/categorias/cable_bobina.png",
-  "cables": "assets/categorias/cables.png",
-  "caliper": "assets/categorias/caliper.png",
-  "clutch": "assets/categorias/clutch.png",
-  "compensador": "assets/categorias/Compensador.png",
-  "compresor_ac": "assets/categorias/compresor_ac.png",
-  "cruz_de_barra": "assets/categorias/cruz_barra.png",
-  "discos_tambores": "assets/categorias/disco_tambore.png",
-  "empaque_admision_escape": "assets/categorias/empaque_admin_cabezote.png",
-  "empaque_cabezote": "assets/categorias/empaque_cabezote.png",
-  "fajas_de_distribucion": "assets/categorias/faja_de_distribucion.png",
-  "fajas_de_accesorios": "assets/categorias/fajas_accesorios.png",
-  "filtro_caja_at": "assets/categorias/filtro_caja_AT.png",
-  "filtros_de_aceite": "assets/categorias/filtro_de_aceite.png",
-  "filtros_de_cabina": "assets/categorias/filtro_de_cabina.png",
-  "galleta_de_compensador": "assets/categorias/galleta_de_compensador.png",
-  "hidraulico": "assets/categorias/Hidraulico.png",
-  "hules_balancin": "assets/categorias/hule_balancin.png",
-  "hules_de_cremallera": "assets/categorias/hule_de_cremallera.png",
-  "hules_estabilizadora": "assets/categorias/hule_estabilizadora.png",
-  "hules_tensora": "assets/categorias/hule_tensora.png",
-  "mangueras": "assets/categorias/mangeras.png",
-  "mangueras_de_freno": "assets/categorias/mangeras_freno.png",
-  "manillas": "assets/categorias/manillas.png",
-  "pastillas_de_freno": "assets/categorias/Pastillas de freno.png",
-  "pcv": "assets/categorias/pcv.png",
-  "poleas": "assets/categorias/poleas.png",
-  "puntas_de_eje": "assets/categorias/punta_eje.png",
-  "retenedores": "assets/categorias/retenedores.png",
-  "roles": "assets/categorias/roles.png",
-  "rotula_direccion_externa": "assets/categorias/rotula_direccion_ext.png",
-  "rotula_direccion_interna": "assets/categorias/rotula_direccion_int.png",
-  "rotula_estabilizadora": "assets/categorias/rotula_estabilizadora.png",
-  "rotula_suspension": "assets/categorias/rotulas_de_suspencion.png",
-  "sellos_de_valvula": "assets/categorias/sellos_de_valvula.png",
-  "sensores": "assets/categorias/sensores.png",
-  "sistema_de_gasolina": "assets/categorias/sistema_gasolina.png",
-  "soportes_de_motor": "assets/categorias/soporte_motor.png",
-  "tacos_y_tuercas": "assets/categorias/taco_tuerca.png",
-  "tapa_distribuidor": "assets/categorias/tapa_distribuidor.png",
-  "tapa_valvulas": "assets/categorias/tapa_valvulas.png",
-  "tapon_radiador": "assets/categorias/tapon_radiador.png",
-  "termostato": "assets/categorias/termostato.png",
-  "tijereta": "assets/categorias/tijereta.png",
-  "zapatas": "assets/categorias/zapatas.png"
-};
+const CATEGORY_STOCK_IMAGES = {};
 
   /** Normaliza un texto: minúsculas, sin tildes, espacios → guion bajo */
   function normalizeStr(str) {
