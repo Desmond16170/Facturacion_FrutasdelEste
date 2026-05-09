@@ -1148,8 +1148,9 @@ const CATEGORY_STOCK_IMAGES = {};
         createdAt: existing?.createdAt || now, updatedAt: now,
       };
       if (!product.name || product.price < 0) { toast("Revisa nombre y precio.", "error"); return; }
-      await upsertProduct(product);
+      // Crear la categoría primero si no existe (evita error de foreign key)
       if (!state.categories.includes(category)) { await upsertCategory(category); state.categories = unique([...state.categories, category]); }
+      await upsertProduct(product);
       if (existing) state.products = state.products.map(p => p.id === id ? product : p);
       else state.products.push(product);
       closeDialog("productDialog"); renderAdmin();
@@ -1223,17 +1224,43 @@ const CATEGORY_STOCK_IMAGES = {};
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Productos");
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(state.categories.map(Categoria => ({ Categoria }))), "Categorias");
-      XLSX.writeFile(wb, `herrera-productos-${dateStamp()}.xlsx`);
+      XLSX.writeFile(wb, `jugos-del-este-productos-${dateStamp()}.xlsx`);
       toast("Archivo Excel exportado.", "success"); return;
     }
-    downloadText(toCsv(rows), `herrera-productos-${dateStamp()}.csv`, "text/csv");
-    toast("Excel no cargo; se exporto CSV compatible.", "success");
+    downloadText(toCsv(rows), `jugos-del-este-productos-${dateStamp()}.csv`, "text/csv");
+    toast("Se exportó como CSV.", "success");
   }
 
   function downloadExcelTemplate() {
-    const rows = [{ Nombre:"Pulpa de Maracuyá 1 Kg", Descripcion:"Pulpa congelada 100% natural sin conservantes", Categoria:"Pulpas congeladas", Marca:"Pulpa 1 Kg", Precio:2500, Disponible:"Si", Destacado:"Si", Codigo:"PUL-MARA-1KG", Imagen:"" }];
-    if (window.XLSX) { const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Productos"); XLSX.writeFile(wb, "plantilla-herrera-productos.xlsx"); return; }
-    downloadText(toCsv(rows), "plantilla-herrera-productos.csv", "text/csv");
+    const rows = [
+      {
+        Nombre: "Pulpa de Maracuyá 1 Kg",
+        Descripcion: "Pulpa congelada 100% natural sin conservantes",
+        Categoria: "Pulpas congeladas",
+        Presentacion: "Pulpa 1 Kg",
+        Precio: 2500,
+        Disponible: "Si",
+        Destacado: "Si",
+        Codigo: "PUL-MARA-1KG",
+      },
+      {
+        Nombre: "Galón de Maracuyá",
+        Descripcion: "Galón natural sin conservantes ni aditivos",
+        Categoria: "Galones",
+        Presentacion: "Galón",
+        Precio: 6500,
+        Disponible: "Si",
+        Destacado: "No",
+        Codigo: "GAL-MARA-1GAL",
+      },
+    ];
+    if (window.XLSX) {
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Productos");
+      XLSX.writeFile(wb, "plantilla-jugos-del-este.xlsx");
+      return;
+    }
+    downloadText(toCsv(rows), "plantilla-jugos-del-este.csv", "text/csv");
   }
 
   async function importExcel(event) {
@@ -1244,19 +1271,28 @@ const CATEGORY_STOCK_IMAGES = {};
       try {
         const rows     = readRowsFromFile(file, reader.result);
         const imported = rows.map(excelRowToProduct).filter(p => p.name);
-        if (!imported.length) { toast("No se encontraron productos validos.", "error"); return; }
+        if (!imported.length) { toast("No se encontraron productos válidos.", "error"); return; }
 
-        const BATCH_SIZE = 500;
+        // 1. Crear todas las categorías nuevas PRIMERO (evita error de foreign key)
+        const newCats = [...new Set(imported.map(p => p.category).filter(Boolean))]
+          .filter(c => !state.categories.includes(c));
+        for (const cat of newCats) {
+          await upsertCategory(cat);
+          state.categories = unique([...state.categories, cat]);
+        }
+
+        // 2. Insertar productos en lotes pequeños para evitar timeouts
+        const BATCH_SIZE = 50;
         const total      = imported.length;
         let   done       = 0;
-        toast(`Importando ${total} productos en lotes de ${BATCH_SIZE}…`);
+        toast(`Importando ${total} productos…`);
 
         for (let i = 0; i < total; i += BATCH_SIZE) {
-          const batch    = imported.slice(i, i + BATCH_SIZE);
+          const batch     = imported.slice(i, i + BATCH_SIZE);
           const batchRows = batch.map(p => ({
             id: p.id, name: p.name, code: p.code,
             description: p.description, category: p.category,
-            brand: p.brand, compatible_with: p.compatibleWith,
+            brand: p.brand, compatible_with: "",
             price: p.price, image: p.image,
             available: p.available, featured: p.featured,
             created_at: p.createdAt, updated_at: p.updatedAt,
@@ -1268,20 +1304,13 @@ const CATEGORY_STOCK_IMAGES = {};
           if (error) throw error;
 
           done += batch.length;
-          toast(`Progreso: ${done} / ${total} guardados…`);
-
-          for (const p of batch) {
-            if (p.category && !state.categories.includes(p.category)) {
-              await upsertCategory(p.category);
-              state.categories = unique([...state.categories, p.category]);
-            }
-          }
+          toast(`Progreso: ${done} / ${total}…`);
         }
 
         await loadFromSupabase();
         renderAdmin();
         toast(`${total} producto${total===1?"":"s"} importado${total===1?"":"s"} correctamente.`, "success");
-      } catch (err) { toast("Error al importar. Revisa la consola.", "error"); console.error(err); }
+      } catch (err) { toast("Error al importar. Revisá la consola.", "error"); console.error(err); }
       finally { event.target.value = ""; }
     };
     if (window.XLSX) reader.readAsArrayBuffer(file); else reader.readAsText(file);
@@ -1293,18 +1322,29 @@ const CATEGORY_STOCK_IMAGES = {};
   }
 
   function productToExcelRow(p) {
-    return { ID:p.id, Nombre:p.name, Descripcion:p.description, Categoria:p.category, Marca:p.brand, Compatible:p.compatibleWith, Precio:p.price, Disponible:p.available?"Si":"No", Destacado:p.featured?"Si":"No", Codigo:p.code, Imagen:p.image };
+    return {
+      ID: p.id, Nombre: p.name, Descripcion: p.description,
+      Categoria: p.category, Presentacion: p.brand,
+      Precio: p.price, Disponible: p.available?"Si":"No",
+      Destacado: p.featured?"Si":"No", Codigo: p.code, Imagen: p.image,
+    };
   }
 
   function excelRowToProduct(row) {
     const now = new Date().toISOString();
     return normalizeProducts([{
-      id: getCell(row,["ID","Id","id"]) || makeId(), name: getCell(row,["Nombre","Producto","name"]),
-      description: getCell(row,["Descripcion","descripcion"]), category: getCell(row,["Categoria","categoria"]) || "Motor",
-      brand: getCell(row,["Marca","marca"]), compatibleWith: getCell(row,["Compatible","Compatibilidad"]),
-      price: getCell(row,["Precio","precio"]) || 0, available: getCell(row,["Disponible","available"]),
-      featured: getCell(row,["Destacado","featured"]), code: getCell(row,["Codigo","Code","Referencia"]),
-      image: getCell(row,["Imagen","Image","imagen"]), createdAt: now, updatedAt: now,
+      id:           getCell(row, ["ID","Id","id"]) || makeId(),
+      name:         getCell(row, ["Nombre","Producto","name"]),
+      description:  getCell(row, ["Descripcion","descripcion","Descripción"]),
+      category:     getCell(row, ["Categoria","categoria","Categoría"]) || "Pulpas congeladas",
+      brand:        getCell(row, ["Presentacion","presentacion","Presentación","Marca","marca"]),
+      compatibleWith: "",
+      price:        getCell(row, ["Precio","precio"]) || 0,
+      available:    getCell(row, ["Disponible","available"]),
+      featured:     getCell(row, ["Destacado","featured"]),
+      code:         getCell(row, ["Codigo","Code","Referencia","codigo"]),
+      image:        getCell(row, ["Imagen","Image","imagen"]),
+      createdAt: now, updatedAt: now,
     }])[0];
   }
 
