@@ -325,34 +325,30 @@ const CATEGORY_STOCK_IMAGES = {};
   }
 
   // ─── CLOUDINARY: subir imagen vía backend seguro ──────────────────────────────
-  // Las credenciales de Cloudinary NUNCA llegan al frontend.
-  // El endpoint /api/upload-image firma y sube la imagen server-side.
+  // Sube la imagen directamente a Supabase Storage (bucket: product-images)
+  // No requiere ningún backend externo — usa la sesión autenticada del admin.
   async function uploadImage(file) {
     const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif"];
     if (!ALLOWED.includes(file.type)) throw new Error("Tipo de archivo no permitido. Usa JPG, PNG, WEBP o GIF.");
     if (file.size > 5 * 1024 * 1024)  throw new Error("La imagen supera el límite de 5 MB.");
 
-    const base64 = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload  = () => resolve(reader.result.split(",")[1]);
-      reader.onerror = () => reject(new Error("Error al leer el archivo."));
-      reader.readAsDataURL(file);
-    });
+    // Nombre único: timestamp + nombre original saneado
+    const ext      = file.name.split(".").pop().toLowerCase();
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").toLowerCase();
+    const path     = `${Date.now()}_${safeName}`;
 
-    const response = await fetch("/api/upload-image", {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: base64, type: file.type, filename: file.name }),
-    });
+    const { error } = await window._sb.storage
+      .from("product-images")
+      .upload(path, file, { contentType: file.type, upsert: false });
 
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || `Error ${response.status} al subir imagen`);
-    }
+    if (error) throw new Error(`Error al subir imagen: ${error.message}`);
 
-    const { url } = await response.json();
-    if (!url) throw new Error("El servidor no devolvió una URL de imagen.");
-    return url;
+    const { data } = window._sb.storage
+      .from("product-images")
+      .getPublicUrl(path);
+
+    if (!data?.publicUrl) throw new Error("No se pudo obtener la URL pública de la imagen.");
+    return data.publicUrl;
   }
 
   // ─── STORE ───────────────────────────────────────────────────────────────────
