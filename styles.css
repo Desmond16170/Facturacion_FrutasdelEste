@@ -2246,8 +2246,27 @@ td {
   transition: top 0.25s ease, padding 0.25s ease;
 }
 
-/* Al hacer scroll: ocultar heading y subir el filtro */
+/* ── Móvil: heading + filtro = un solo bloque unificado ── */
 @media (max-width: 680px) {
+  .catalog-heading-sticky {
+    background: rgba(17, 41, 24, 0.96);
+    border: 1px solid var(--line);
+    border-bottom: none;           /* sin borde inferior: se fusiona con el filtro */
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 14px 16px 10px;
+    margin-bottom: 0;
+    box-shadow: none;
+  }
+  .catalog-filter-bar,
+  .filters-panel.catalog-filter-bar {
+    top: 72px;                     /* se pega justo al heading */
+    border-top: none;              /* sin borde superior: continúa del heading */
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+    margin-bottom: 14px;
+  }
+
+  /* Al hacer scroll: ocultar heading y subir el filtro */
   .catalog-heading-sticky.heading-hidden {
     transform: translateY(-110%);
     opacity: 0;
@@ -2258,7 +2277,9 @@ td {
   }
   .catalog-filter-bar.filter-compact,
   .filters-panel.catalog-filter-bar.filter-compact {
-    top: 72px; /* se pega justo bajo el header */
+    top: 72px;
+    border-radius: var(--radius);  /* al estar solo, vuelven los 4 bordes */
+    border-top: 1px solid var(--line);
     padding-top: 8px;
     padding-bottom: 8px;
   }
