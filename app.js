@@ -945,7 +945,7 @@ const CATEGORY_STOCK_IMAGES = {};
     if (!lines.length) return;
     const total   = lines.reduce((s, l) => s + l.price * l.qty, 0);
     const detail  = lines.map(l => `- ${l.qty} x ${l.name} (${l.brand || "Sin presentación"}) - ${l.available ? "Disponible" : "Solicitar disponibilidad"} - ${formatMoney(l.price * l.qty)}`).join("\n");
-    const message = `Hola, quisiera solicitar una cotizacion en Herrera Auto Partes:\n\n${detail}\n\nTotal estimado: ${formatMoney(total)}\n\nPor favor confirmar disponibilidad y precio final.`;
+    const message = `Hola, me gustaria solicitar los siguentes productos \n\n${detail}\n\nTotal estimado: ${formatMoney(total)}\n\nPor favor confirmar disponibilidad y precio final. Asi mismo metodos de entrega y pago`;
     window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
   }
 
