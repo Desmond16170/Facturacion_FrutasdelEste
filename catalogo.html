@@ -56,42 +56,44 @@
 
     <main>
       <section class="catalog-section catalog-page" id="catalogo">
-        <div class="section-heading catalog-heading-sticky">
-          <div>
-            <span class="section-kicker">Catálogo</span>
-            <h1>Pulpas congeladas y galones</h1>
+        <!-- Sticky wrapper: en móvil, heading + filtro se mueven juntos -->
+        <div class="catalog-sticky-wrap">
+          <div class="section-heading catalog-heading-sticky">
+            <div class="catalog-heading-left">
+              <span class="section-kicker">Catálogo</span>
+              <h1>Pulpas congeladas y galones</h1>
+            </div>
+            <span class="result-count" id="resultCount">0 productos</span>
           </div>
-          <span class="result-count" id="resultCount">0 productos</span>
-        </div>
 
-        <aside class="filters-panel catalog-filter-bar" aria-label="Filtros del catálogo">
-          <label class="catalog-search-field catalog-search-full">
-            Buscar
-            <input id="searchInput" type="search" placeholder="Sabor, tipo o presentación" />
-          </label>
-          <div class="filters-row-secondary">
-            <label>
-              Categoría
-              <select id="categoryFilter"></select>
+          <aside class="filters-panel catalog-filter-bar" aria-label="Filtros del catálogo">
+            <label class="catalog-search-field catalog-search-full">
+              <input id="searchInput" type="search" placeholder="🔍  Buscar sabor, tipo o presentación…" />
             </label>
-            <label>
-              Ordenar por
-              <select id="sortFilter">
-                <option value="featured">Destacados primero</option>
-                <option value="name">Nombre A-Z</option>
-                <option value="price-asc">Precio menor</option>
-                <option value="price-desc">Precio mayor</option>
-              </select>
-            </label>
-            <button class="btn-muted" type="button" id="clearFiltersButton">Limpiar filtros</button>
-          </div>
-          <!-- Selectores ocultos mantenidos para compatibilidad con app.js -->
-          <select id="brandFilter" hidden></select>
-          <select id="compatibleFilter" hidden></select>
-          <select id="availabilityFilter" hidden>
-            <option value="all">Todos</option>
-          </select>
-        </aside>
+            <div class="filters-row-secondary">
+              <label>
+                Categoría
+                <select id="categoryFilter"></select>
+              </label>
+              <label>
+                Ordenar por
+                <select id="sortFilter">
+                  <option value="featured">Destacados primero</option>
+                  <option value="name">Nombre A-Z</option>
+                  <option value="price-asc">Precio menor</option>
+                  <option value="price-desc">Precio mayor</option>
+                </select>
+              </label>
+              <button class="btn-muted btn-clear-filters" type="button" id="clearFiltersButton">✕ Limpiar</button>
+            </div>
+            <!-- Selectores ocultos mantenidos para compatibilidad con app.js -->
+            <select id="brandFilter" hidden></select>
+            <select id="compatibleFilter" hidden></select>
+            <select id="availabilityFilter" hidden>
+              <option value="all">Todos</option>
+            </select>
+          </aside>
+        </div>
 
         <!-- Código de cliente -->
         <div class="client-code-bar" id="clientCodeBar">
