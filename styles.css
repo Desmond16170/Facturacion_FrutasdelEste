@@ -2234,6 +2234,7 @@ td {
   z-index: 70;
   background: var(--bg);
   backdrop-filter: none;
+  transition: transform 0.25s ease, opacity 0.25s ease, max-height 0.25s ease, padding 0.25s ease;
 }
 .catalog-filter-bar, .filters-panel.catalog-filter-bar {
   position: sticky;
@@ -2242,4 +2243,23 @@ td {
   background: rgba(17, 41, 24, 0.96);
   border: 1px solid var(--line);
   box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+  transition: top 0.25s ease, padding 0.25s ease;
+}
+
+/* Al hacer scroll: ocultar heading y subir el filtro */
+@media (max-width: 680px) {
+  .catalog-heading-sticky.heading-hidden {
+    transform: translateY(-110%);
+    opacity: 0;
+    pointer-events: none;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+  .catalog-filter-bar.filter-compact,
+  .filters-panel.catalog-filter-bar.filter-compact {
+    top: 72px; /* se pega justo bajo el header */
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
 }

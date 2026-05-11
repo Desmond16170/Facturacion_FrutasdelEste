@@ -1552,3 +1552,28 @@ const CATEGORY_STOCK_IMAGES = {};
   const header = document.querySelector(".site-header");
   if (header) ro.observe(header);
 })();
+
+// ── Compactar barra de filtros al hacer scroll en móvil ──────────────────────
+(() => {
+  const heading = document.querySelector(".catalog-heading-sticky");
+  const filterBar = document.querySelector(".catalog-filter-bar");
+  if (!heading || !filterBar) return;
+
+  let lastScrollY = window.scrollY;
+  let ticking = false;
+
+  function applyScrollState() {
+    const scrolled = window.scrollY > 60;
+    heading.classList.toggle("heading-hidden", scrolled);
+    filterBar.classList.toggle("filter-compact", scrolled);
+    lastScrollY = window.scrollY;
+    ticking = false;
+  }
+
+  window.addEventListener("scroll", () => {
+    if (!ticking) {
+      requestAnimationFrame(applyScrollState);
+      ticking = true;
+    }
+  }, { passive: true });
+})();
