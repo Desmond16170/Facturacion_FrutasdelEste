@@ -1880,11 +1880,11 @@ const CATEGORY_STOCK_IMAGES = {};
     const dialog = document.getElementById("codeDialog");
     if (!dialog) return;
 
-    document.getElementById("codeDialogTitle").textContent = existing ? "Editar código" : "Nuevo código";
-    document.getElementById("codeInput").value        = existing?.code || "";
-    document.getElementById("codeInput").disabled     = !!existing; // no editar PK
-    document.getElementById("codeLabelInput").value   = existing?.label || "";
-    document.getElementById("codeDiscountInput").value = existing?.discount || "";
+    document.getElementById("codeDialogTitle").textContent   = existing ? "Editar código" : "Nuevo código";
+    document.getElementById("clientCodeKeyInput").value      = existing?.code || "";
+    document.getElementById("clientCodeKeyInput").disabled   = !!existing;
+    document.getElementById("codeLabelInput").value          = existing?.label || "";
+    document.getElementById("codeDiscountInput").value       = existing?.discount || "";
 
     renderRulesGrid();
     dialog.showModal();
@@ -1935,7 +1935,7 @@ const CATEGORY_STOCK_IMAGES = {};
     });
 
     document.getElementById("saveCodeButton")?.addEventListener("click", async () => {
-      const code     = document.getElementById("codeInput")?.value?.trim().toUpperCase();
+      const code     = document.getElementById("clientCodeKeyInput")?.value?.trim().toUpperCase();
       const label    = document.getElementById("codeLabelInput")?.value?.trim();
       const discount = Number(document.getElementById("codeDiscountInput")?.value || 0);
       if (!code) { toast("El código es obligatorio.", "error"); return; }
