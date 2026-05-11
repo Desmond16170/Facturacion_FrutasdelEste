@@ -904,7 +904,7 @@ const CATEGORY_STOCK_IMAGES = {};
     const quoteButton = el("button", "btn-primary", "Enviar cotizacion por WhatsApp");
     quoteButton.type  = "button";
     quoteButton.addEventListener("click", sendWhatsAppQuote);
-    footer.replaceChildren(totalRow(total), el("p", "quote-note", "La cotizacion se enviara al WhatsApp 8737-0327."), quoteButton);
+    footer.replaceChildren(totalRow(total), el("p", "quote-note", "La cotizacion se enviara al WhatsApp 6225-3122."), quoteButton);
   }
 
   function createCartLine(line) {
