@@ -1588,19 +1588,28 @@ const CATEGORY_STOCK_IMAGES = {};
   if (header) ro.observe(header);
 })();
 
-// ── Heading compacto en desktop al hacer scroll ──────────────────────────────
-// En móvil (≤680px) el heading es estático (CSS), solo en desktop se recalcula el top del filtro
+// ── Ocultar barra de filtros al hacer scroll hacia abajo (solo móvil) ────────
 (() => {
-  const filterBar = document.querySelector(".catalog-filter-bar");
-  if (!filterBar) return;
+  const wrap = document.querySelector(".catalog-sticky-wrap");
+  if (!wrap) return;
 
+  let lastY = window.scrollY;
   let ticking = false;
 
   function applyScrollState() {
-    // En desktop: limpiar clases residuales si las hubiera
-    if (window.innerWidth > 680) {
-      filterBar.classList.remove("filter-compact");
+    const currentY = window.scrollY;
+    const isMobile = window.innerWidth <= 680;
+
+    if (!isMobile) {
+      // Desktop: siempre visible
+      wrap.classList.remove("wrap-hidden");
+    } else {
+      const scrollingDown = currentY > lastY;
+      const pastThreshold = currentY > 80; // no ocultar en los primeros 80px
+      wrap.classList.toggle("wrap-hidden", scrollingDown && pastThreshold);
     }
+
+    lastY = currentY;
     ticking = false;
   }
 
@@ -1610,6 +1619,10 @@ const CATEGORY_STOCK_IMAGES = {};
       ticking = true;
     }
   }, { passive: true });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 680) wrap.classList.remove("wrap-hidden");
+  });
 })();
 
 // ══════════════════════════════════════════════════════════════════════════════
