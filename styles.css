@@ -2211,13 +2211,13 @@ td {
 }
 
 @media (max-width: 620px) {
-  .section-heading, .footer-bottom, .admin-topbar, .panel-card-header, .dialog-card header, .dialog-card footer { align-items: stretch; flex-direction: column; }
-  .nav-link, .cart-button, .btn-primary, .btn-secondary, .btn-muted { width: 100%; }
+  .section-heading:not(.catalog-heading-sticky), .footer-bottom, .admin-topbar, .panel-card-header, .dialog-card header, .dialog-card footer { align-items: stretch; flex-direction: column; }
+  .nav-link, .cart-button, .btn-primary, .btn-secondary, .btn-muted:not(.btn-clear-filters) { width: 100%; }
   .hero h1 { font-size: 52px; }
   .page-hero h1 { font-size: 48px; }
   .form-grid, .stats-grid, .admin-nav { grid-template-columns: 1fr; }
   .products-grid { grid-template-columns: 1fr; }
-  .catalog-heading-sticky, .catalog-filter-bar, .filters-panel.catalog-filter-bar { position: static; }
+  /* position manejado por .catalog-sticky-wrap */
   .catalog-filter-bar { border-radius: var(--radius); }
   .product-detail-shell { gap: 20px; padding: 14px; border-radius: var(--radius); }
   .product-detail-info h1 { font-size: 34px; }
@@ -2226,69 +2226,100 @@ td {
   .sabores-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-/* Catalog sticky fixes */
+/* ══ Catalog sticky: wrapper unificado ═════════════════════════════════════ */
 .catalog-page, .catalog-section { overflow: visible; }
-.catalog-heading-sticky {
+
+/* Desktop: heading y filtro sticky apilados */
+.catalog-sticky-wrap {
   position: sticky;
   top: var(--header-h, 72px);
-  z-index: 90;
+  z-index: 89;
+}
+.catalog-heading-sticky {
+  position: static;
   background: var(--bg);
-  backdrop-filter: none;
-  transition: transform 0.25s ease, opacity 0.25s ease, max-height 0.25s ease, padding 0.25s ease;
+  padding: 18px 0 14px;
+  margin-bottom: 0;
 }
 .catalog-filter-bar, .filters-panel.catalog-filter-bar {
-  position: sticky;
-  top: calc(var(--header-h, 72px) + var(--heading-h, 106px));
-  z-index: 89;
+  position: static;
   background: rgba(17, 41, 24, 0.96);
   border: 1px solid var(--line);
   box-shadow: 0 14px 32px rgba(0,0,0,0.22);
-  transition: top 0.25s ease, padding 0.25s ease;
+  margin-bottom: 18px;
 }
 
-/* ── Móvil: heading + filtro = un solo bloque unificado ── */
+/* ── Móvil: heading compacto + filtro = bloque unificado sticky ── */
 @media (max-width: 680px) {
-  .catalog-heading-sticky {
-    background: rgba(17, 41, 24, 0.96);
-    border: 1px solid var(--line);
-    border-bottom: none;           /* sin borde inferior: se fusiona con el filtro */
-    border-radius: var(--radius) var(--radius) 0 0;
-    padding: 14px 16px 10px;
-    margin-bottom: 0;
-    box-shadow: none;
+  .catalog-sticky-wrap {
     top: var(--header-h, 72px);
+    background: rgba(17, 41, 24, 0.97);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.28);
+    margin-bottom: 12px;
+    overflow: hidden;
   }
+  /* Heading: fila compacta con kicker + result-count, h1 oculto */
+  .catalog-heading-sticky {
+    padding: 8px 14px 6px;
+    margin-bottom: 0;
+    background: transparent;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .catalog-heading-sticky h1 {
+    display: none;
+  }
+  .catalog-heading-sticky.section-heading {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+  .catalog-heading-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .result-count {
+    margin-left: auto;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  /* Filtro: sin bordes propios, integrado al wrap */
   .catalog-filter-bar,
   .filters-panel.catalog-filter-bar {
-    top: calc(var(--header-h, 72px) + var(--heading-h, 72px)); /* debajo del heading */
-    border-top: none;              /* sin borde superior: continúa del heading */
-    border-radius: 0 0 var(--radius) var(--radius);
-    box-shadow: 0 14px 32px rgba(0,0,0,0.22);
-    margin-bottom: 14px;
-    transition: top 0.25s ease, border-radius 0.2s ease, border-top 0.2s ease, padding 0.2s ease;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    padding: 10px 12px 12px;
+    margin-bottom: 0;
+    gap: 8px;
   }
-
-  /* Al hacer scroll: ocultar heading colapsando su altura (no transform, para no dejar espacio) */
-  .catalog-heading-sticky.heading-hidden {
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    overflow: hidden;
-    border-width: 0;
-    margin: 0;
-    opacity: 0;
-    pointer-events: none;
-    transition: max-height 0.25s ease, padding 0.25s ease, opacity 0.2s ease, border-width 0.25s ease;
+  /* Búsqueda: input más compacto sin label */
+  .catalog-search-full {
+    font-size: 0; /* ocultar el label "Buscar" */
   }
-  .catalog-filter-bar.filter-compact,
-  .filters-panel.catalog-filter-bar.filter-compact {
-    top: var(--header-h, 72px);   /* sube directo al header cuando el heading desaparece */
-    border-radius: var(--radius);  /* al estar solo, vuelven los 4 bordes */
-    border-top: 1px solid var(--line);
-    padding-top: 8px;
-    padding-bottom: 8px;
+  .catalog-search-full input {
+    font-size: 14px;
+  }
+  /* btn limpiar: pequeño e inline */
+  .btn-clear-filters {
+    grid-column: auto !important;
+    width: auto !important;
+    padding: 6px 12px;
+    font-size: 12px;
+    align-self: end;
+    white-space: nowrap;
+    opacity: 0.7;
+  }
+  /* Hint: oculto en móvil — consume espacio sin aportar */
+  .catalog-hint {
+    display: none !important;
   }
 }
+
+
 
 /* ══════════════════════════════════════════════════════
    HERO CAROUSEL
