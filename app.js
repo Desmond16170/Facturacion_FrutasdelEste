@@ -85,6 +85,7 @@ const CATEGORY_STOCK_IMAGES = {};
   // Exponer al window para que módulos externos (carousel, códigos) puedan usarlos
   window._renderProducts = () => { if (state.page === "catalog" || state.page === "home") renderProducts(); };
   window._state = state;
+  window.toast = (message, type) => toast(message, type);
 
   async function init() {
     if (!window._sb) { console.error("supabase.js no cargado"); return; }
@@ -1719,6 +1720,9 @@ const CATEGORY_STOCK_IMAGES = {};
 // SISTEMA DE CÓDIGOS DE CLIENTE
 // ══════════════════════════════════════════════════════════════════════════════
 ;(() => {
+  // Helper: delega al toast del IIFE principal (expuesto en window.toast)
+  const toast = (msg, type) => typeof window.toast === "function" ? window.toast(msg, type) : console.log(`[${type||"info"}] ${msg}`);
+
   // ── Estado del código activo ──────────────────────────────────────────────
   const CLIENT_CODE_KEY = "fje_client_code";
   let activeClientCode = null; // { code, label, discount, rules: [{productId, price}] }
