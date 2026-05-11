@@ -69,7 +69,7 @@ img {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 100;
   border-bottom: 1px solid var(--line-soft);
   background: rgba(8, 26, 14, 0.95);
   backdrop-filter: blur(12px);
@@ -191,7 +191,7 @@ textarea:focus {
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  z-index: 51;
+  z-index: 103;
   flex-shrink: 0;
 }
 
@@ -220,7 +220,7 @@ textarea:focus {
 .mobile-nav-overlay {
   position: fixed;
   inset: 0;
-  z-index: 49;
+  z-index: 101;
   display: block;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
@@ -245,7 +245,7 @@ textarea:focus {
   top: 0;
   right: 0;
   bottom: 0;
-  z-index: 50;
+  z-index: 102;
   display: flex;
   width: min(320px, 90vw);
   padding: 80px 20px 32px;
@@ -1491,7 +1491,7 @@ label {
 .cart-drawer {
   position: fixed;
   inset: 0;
-  z-index: 80;
+  z-index: 110;
   display: none;
 }
 
@@ -2230,16 +2230,16 @@ td {
 .catalog-page, .catalog-section { overflow: visible; }
 .catalog-heading-sticky {
   position: sticky;
-  top: 72px;
-  z-index: 70;
+  top: var(--header-h, 72px);
+  z-index: 90;
   background: var(--bg);
   backdrop-filter: none;
   transition: transform 0.25s ease, opacity 0.25s ease, max-height 0.25s ease, padding 0.25s ease;
 }
 .catalog-filter-bar, .filters-panel.catalog-filter-bar {
   position: sticky;
-  top: 178px;
-  z-index: 69;
+  top: calc(var(--header-h, 72px) + var(--heading-h, 106px));
+  z-index: 89;
   background: rgba(17, 41, 24, 0.96);
   border: 1px solid var(--line);
   box-shadow: 0 14px 32px rgba(0,0,0,0.22);
@@ -2256,28 +2256,33 @@ td {
     padding: 14px 16px 10px;
     margin-bottom: 0;
     box-shadow: none;
+    top: var(--header-h, 72px);
   }
   .catalog-filter-bar,
   .filters-panel.catalog-filter-bar {
-    top: 72px;                     /* se pega justo al heading */
+    top: calc(var(--header-h, 72px) + var(--heading-h, 72px)); /* debajo del heading */
     border-top: none;              /* sin borde superior: continúa del heading */
     border-radius: 0 0 var(--radius) var(--radius);
     box-shadow: 0 14px 32px rgba(0,0,0,0.22);
     margin-bottom: 14px;
+    transition: top 0.25s ease, border-radius 0.2s ease, border-top 0.2s ease, padding 0.2s ease;
   }
 
-  /* Al hacer scroll: ocultar heading y subir el filtro */
+  /* Al hacer scroll: ocultar heading colapsando su altura (no transform, para no dejar espacio) */
   .catalog-heading-sticky.heading-hidden {
-    transform: translateY(-110%);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+    border-width: 0;
+    margin: 0;
     opacity: 0;
     pointer-events: none;
-    padding: 0;
-    max-height: 0;
-    overflow: hidden;
+    transition: max-height 0.25s ease, padding 0.25s ease, opacity 0.2s ease, border-width 0.25s ease;
   }
   .catalog-filter-bar.filter-compact,
   .filters-panel.catalog-filter-bar.filter-compact {
-    top: 72px;
+    top: var(--header-h, 72px);   /* sube directo al header cuando el heading desaparece */
     border-radius: var(--radius);  /* al estar solo, vuelven los 4 bordes */
     border-top: 1px solid var(--line);
     padding-top: 8px;
