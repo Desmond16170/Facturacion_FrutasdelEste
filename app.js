@@ -904,7 +904,7 @@ const CATEGORY_STOCK_IMAGES = {};
     const quoteButton = el("button", "btn-primary", "Enviar cotizacion por WhatsApp");
     quoteButton.type  = "button";
     quoteButton.addEventListener("click", sendWhatsAppQuote);
-    footer.replaceChildren(totalRow(total), el("p", "quote-note", "La cotizacion se enviara al WhatsApp 6225-3122."), quoteButton);
+    footer.replaceChildren(totalRow(total), el("p", "quote-note", "La cotizacion se enviara al WhatsApp 8737-0327."), quoteButton);
   }
 
   function createCartLine(line) {
@@ -945,7 +945,7 @@ const CATEGORY_STOCK_IMAGES = {};
     if (!lines.length) return;
     const total   = lines.reduce((s, l) => s + l.price * l.qty, 0);
     const detail  = lines.map(l => `- ${l.qty} x ${l.name} (${l.brand || "Sin presentación"}) - ${l.available ? "Disponible" : "Solicitar disponibilidad"} - ${formatMoney(l.price * l.qty)}`).join("\n");
-    const message = `Hola, me gustaria solicitar los siguentes productos \n\n${detail}\n\nTotal estimado: ${formatMoney(total)}\n\nPor favor confirmar disponibilidad y precio final. Asi mismo metodos de entrega y pago`;
+    const message = `Hola, quisiera solicitar una cotizacion en Herrera Auto Partes:\n\n${detail}\n\nTotal estimado: ${formatMoney(total)}\n\nPor favor confirmar disponibilidad y precio final.`;
     window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
   }
 
@@ -1757,10 +1757,24 @@ const CATEGORY_STOCK_IMAGES = {};
   // Exponer para que app.js principal pueda usarla al renderizar precios
   window.getClientPrice = function(product) {
     if (!activeClientCode || !product) return null;
-    // 1. Regla específica por producto ID
-    const rule = (activeClientCode.rules || []).find(r => r.productId === product.id);
-    if (rule && rule.price != null) return Number(rule.price);
-    // 2. Descuento global %
+    const rules = activeClientCode.rules || [];
+
+    // 1. Precio fijo por producto específico (máxima prioridad)
+    const productRule = rules.find(r => r.type === "product" && r.productId === product.id);
+    if (productRule && productRule.price != null) return Number(productRule.price);
+
+    // Compatibilidad con reglas antiguas sin campo type
+    const legacyRule = rules.find(r => !r.type && r.productId === product.id);
+    if (legacyRule && legacyRule.price != null) return Number(legacyRule.price);
+
+    // 2. Regla por categoría (precio fijo o descuento %)
+    const categoryRule = rules.find(r => r.type === "category" && r.categoryName === product.category);
+    if (categoryRule) {
+      if (categoryRule.price != null) return Number(categoryRule.price);
+      if (categoryRule.discount > 0) return Math.round(product.price * (1 - categoryRule.discount / 100));
+    }
+
+    // 3. Descuento global %
     if (activeClientCode.discount > 0) {
       return Math.round(product.price * (1 - activeClientCode.discount / 100));
     }
@@ -1912,34 +1926,98 @@ const CATEGORY_STOCK_IMAGES = {};
   function renderRulesGrid() {
     const grid = document.getElementById("codeRulesGrid");
     if (!grid) return;
-    const products = window._adminProducts || [];
+    const products   = window._adminProducts || [];
+    const categories = window._state?.categories || [];
+
     grid.replaceChildren(...draftRules.map((rule, i) => {
+      // Normalizar reglas legacy (sin type)
+      if (!rule.type) rule.type = "product";
+
       const row = document.createElement("div");
       row.className = "code-rule-row";
 
-      // Selector de producto
-      const sel = document.createElement("select");
-      products.forEach(p => {
+      // ── Selector de tipo ──
+      const typeSelect = document.createElement("select");
+      typeSelect.className = "rule-type-select";
+      [["product", "Producto"], ["category", "Categoría"]].forEach(([val, label]) => {
         const opt = document.createElement("option");
-        opt.value = p.id;
-        opt.textContent = `${p.name} (${p.brand || "sin presentación"})`;
-        if (p.id === rule.productId) opt.selected = true;
-        sel.appendChild(opt);
+        opt.value = val; opt.textContent = label;
+        if (val === rule.type) opt.selected = true;
+        typeSelect.appendChild(opt);
       });
-      sel.addEventListener("change", () => { draftRules[i].productId = sel.value; });
 
-      // Precio fijo
+      // ── Selector de producto o categoría ──
+      const targetSelect = document.createElement("select");
+      targetSelect.className = "rule-target-select";
+
+      function populateTargetSelect() {
+        targetSelect.replaceChildren();
+        if (draftRules[i].type === "product") {
+          products.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p.id;
+            opt.textContent = `${p.name}${p.brand ? " · " + p.brand : ""}`;
+            if (p.id === rule.productId) opt.selected = true;
+            targetSelect.appendChild(opt);
+          });
+        } else {
+          categories.forEach(cat => {
+            const opt = document.createElement("option");
+            opt.value = cat; opt.textContent = cat;
+            if (cat === rule.categoryName) opt.selected = true;
+            targetSelect.appendChild(opt);
+          });
+        }
+      }
+      populateTargetSelect();
+
+      typeSelect.addEventListener("change", () => {
+        draftRules[i].type = typeSelect.value;
+        draftRules[i].productId = undefined;
+        draftRules[i].categoryName = undefined;
+        draftRules[i].price = undefined;
+        draftRules[i].discount = undefined;
+        populateTargetSelect();
+        updatePriceFields();
+      });
+
+      targetSelect.addEventListener("change", () => {
+        if (draftRules[i].type === "product") draftRules[i].productId = targetSelect.value;
+        else draftRules[i].categoryName = targetSelect.value;
+      });
+
+      // ── Precio fijo ──
       const priceInput = document.createElement("input");
-      priceInput.type = "number"; priceInput.min = "0"; priceInput.placeholder = "Precio (₡)";
+      priceInput.type = "number"; priceInput.min = "0"; priceInput.placeholder = "Precio fijo (₡)";
+      priceInput.className = "rule-price-input";
       priceInput.value = rule.price ?? "";
-      priceInput.addEventListener("input", () => { draftRules[i].price = Number(priceInput.value); });
+      priceInput.addEventListener("input", () => {
+        draftRules[i].price = priceInput.value !== "" ? Number(priceInput.value) : undefined;
+        if (draftRules[i].price != null) { draftRules[i].discount = undefined; discInput.value = ""; }
+      });
 
-      // Botón eliminar
+      // ── Descuento % (solo para categoría) ──
+      const discInput = document.createElement("input");
+      discInput.type = "number"; discInput.min = "0"; discInput.max = "100"; discInput.placeholder = "Desc. % (categoría)";
+      discInput.className = "rule-discount-input";
+      discInput.value = rule.discount ?? "";
+      discInput.addEventListener("input", () => {
+        draftRules[i].discount = discInput.value !== "" ? Number(discInput.value) : undefined;
+        if (draftRules[i].discount != null) { draftRules[i].price = undefined; priceInput.value = ""; }
+      });
+
+      function updatePriceFields() {
+        const isCat = draftRules[i].type === "category";
+        discInput.style.display = isCat ? "" : "none";
+      }
+      updatePriceFields();
+
+      // ── Botón eliminar ──
       const del = document.createElement("button");
-      del.className = "btn-muted"; del.textContent = "✕"; del.style.padding = "4px 8px";
+      del.className = "btn-muted"; del.textContent = "✕"; del.style.cssText = "padding:4px 8px;flex-shrink:0";
       del.addEventListener("click", () => { draftRules.splice(i, 1); renderRulesGrid(); });
 
-      row.append(sel, priceInput, del);
+      row.append(typeSelect, targetSelect, priceInput, discInput, del);
       return row;
     }));
   }
@@ -1948,8 +2026,9 @@ const CATEGORY_STOCK_IMAGES = {};
     document.getElementById("newCodeButton")?.addEventListener("click", () => openCodeDialog(null));
 
     document.getElementById("addRuleButton")?.addEventListener("click", () => {
-      const products = window._adminProducts || [];
-      draftRules.push({ productId: products[0]?.id || "", price: "" });
+      const products   = window._adminProducts || [];
+      const categories = window._state?.categories || [];
+      draftRules.push({ type: "product", productId: products[0]?.id || "", price: undefined });
       renderRulesGrid();
     });
 
