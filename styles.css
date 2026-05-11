@@ -665,78 +665,77 @@ h2 {
   align-items: start;
 }
 
+/* ── Barra de filtros: desktop una fila, móvil dos filas ── */
 .catalog-filter-bar {
   position: sticky;
   top: var(--header-h, 72px);
   z-index: 29;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: end;
   gap: 10px;
   margin: 0 0 18px;
-  padding: 12px 14px;
+  padding: 12px 16px;
   border-radius: 0 0 var(--radius) var(--radius);
   background: var(--bg);
-  backdrop-filter: none;
 }
 
-/* Buscar ocupa el espacio sobrante */
+/* Buscar: ocupa toda la primera columna */
 .catalog-search-full {
-  flex: 2 1 200px;
   min-width: 0;
 }
-
 .catalog-search-full input {
   width: 100%;
   box-sizing: border-box;
 }
 
-/* Categoría y Ordenar tienen tamaño fijo */
+/* Categoría y Ordenar: columnas automáticas, tamaño razonable */
 .filters-row-secondary {
-  display: contents; /* los hijos participan directo en el flex padre */
+  display: contents;
 }
-
 .filters-row-secondary label {
-  flex: 1 1 150px;
   min-width: 0;
+  width: 160px;
 }
-
 .filters-row-secondary .btn-muted {
-  flex: 0 0 auto;
   white-space: nowrap;
   align-self: flex-end;
+  height: fit-content;
 }
 
 .catalog-filter-bar label {
   min-width: 0;
 }
-
 .catalog-filter-bar input,
 .catalog-filter-bar select {
   min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Móvil: stack compacto de 2 columnas */
+/* ── Móvil: buscar arriba full-width, categ+ordenar abajo en 2 cols ── */
 @media (max-width: 680px) {
   .catalog-filter-bar {
-    flex-wrap: wrap;
-    padding: 10px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
     gap: 8px;
+    padding: 10px 12px;
   }
   .catalog-search-full {
-    flex: 1 1 100%;
+    grid-column: 1 / -1; /* fila 1: ancho completo */
   }
+  /* Categoría: columna 1, fila 2 */
   .filters-row-secondary {
     display: contents;
   }
   .filters-row-secondary label {
-    flex: 1 1 calc(50% - 4px);
-    min-width: 0;
+    width: auto;
   }
+  /* Botón limpiar: oculto en móvil o integrado */
   .filters-row-secondary .btn-muted {
-    flex: 1 1 100%;
+    grid-column: 1 / -1;
+    width: 100%;
     text-align: center;
-    margin-top: 0;
   }
 }
 
