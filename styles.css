@@ -2489,8 +2489,9 @@ td {
 }
 .code-rule-row {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: 8px;
+  /* tipo | target | precio | descuento% | eliminar */
+  grid-template-columns: 110px 1fr 130px 120px auto;
+  gap: 6px;
   align-items: center;
 }
 .code-rule-row input, .code-rule-row select {
@@ -2500,4 +2501,23 @@ td {
   border-radius: var(--radius-sm);
   color: var(--text);
   font-size: 13px;
+  min-width: 0;
+}
+.rule-type-select {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gold) !important;
+}
+/* En móvil: apilar en 2 columnas */
+@media (max-width: 820px) {
+  .code-rule-row {
+    grid-template-columns: 1fr 1fr auto;
+    grid-template-rows: auto auto;
+  }
+  .rule-type-select  { grid-column: 1; }
+  .rule-target-select { grid-column: 2; }
+  .rule-price-input   { grid-column: 1; }
+  .rule-discount-input { grid-column: 2; }
+  .code-rule-row button { grid-column: 3; grid-row: 1 / 3; align-self: center; }
 }
