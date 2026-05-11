@@ -28,6 +28,7 @@
         <button class="nav-item active" type="button" data-admin-page="dashboard">Dashboard</button>
         <button class="nav-item" type="button" data-admin-page="products">Productos</button>
         <button class="nav-item" type="button" data-admin-page="categories">Categorias</button>
+        <button class="nav-item" type="button" data-admin-page="codes">Códigos cliente</button>
         <button class="nav-item" type="button" data-admin-page="excel">Excel</button>
         <button id="logoutBtn" class="nav-item" type="button" hidden style="margin-top:auto;color:#c00;">Cerrar sesión</button>
       </nav>
@@ -140,6 +141,35 @@
                 </tr>
               </thead>
               <tbody id="categoriesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Códigos de cliente ── -->
+      <section class="admin-page" id="page-codes">
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2>Códigos de cliente</h2>
+            <button class="btn-primary" type="button" id="newCodeButton">Nuevo código</button>
+          </div>
+          <p class="panel-note">
+            Cada código tiene un precio fijo por producto o una reducción porcentual global.
+            El cliente lo ingresa en la tienda y ve los precios ajustados.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Etiqueta</th>
+                  <th>Tipo</th>
+                  <th>Descuento global</th>
+                  <th>Reglas por producto</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="codesTableBody"></tbody>
             </table>
           </div>
         </div>
@@ -264,6 +294,41 @@
         <footer>
           <button class="btn-muted" type="button" data-close-dialog="categoryDialog">Cancelar</button>
           <button class="btn-primary" type="submit">Guardar</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <!-- Dialog: código de cliente -->
+    <dialog class="app-dialog" id="codeDialog">
+      <form method="dialog" class="dialog-card" id="codeForm">
+        <header>
+          <h2 id="codeDialogTitle">Nuevo código</h2>
+          <button class="icon-button" type="button" data-close-dialog="codeDialog">x</button>
+        </header>
+        <div class="form-grid">
+          <label>
+            Código (lo que escribe el cliente)
+            <input id="codeInput" type="text" placeholder="ej: CLIENTE01" style="text-transform:uppercase" />
+          </label>
+          <label>
+            Etiqueta interna
+            <input id="codeLabelInput" type="text" placeholder="ej: Distribuidor zona norte" />
+          </label>
+          <label>
+            Descuento global (%) — aplica a todos los productos sin regla específica
+            <input id="codeDiscountInput" type="number" min="0" max="100" placeholder="ej: 20" />
+          </label>
+        </div>
+        <div style="margin-top:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <strong style="font-size:13px;text-transform:uppercase;color:var(--muted-2)">Precios fijos por producto</strong>
+            <button class="btn-muted" type="button" id="addRuleButton" style="font-size:12px;padding:4px 10px">+ Agregar regla</button>
+          </div>
+          <div class="code-rules-grid" id="codeRulesGrid"></div>
+        </div>
+        <footer>
+          <button class="btn-muted" type="button" data-close-dialog="codeDialog">Cancelar</button>
+          <button class="btn-primary" type="button" id="saveCodeButton">Guardar código</button>
         </footer>
       </form>
     </dialog>

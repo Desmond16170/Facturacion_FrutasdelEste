@@ -82,6 +82,10 @@ const CATEGORY_STOCK_IMAGES = {};
   // ─── ARRANQUE ────────────────────────────────────────────────────────────────
   init();
 
+  // Exponer al window para que módulos externos (carousel, códigos) puedan usarlos
+  window._renderProducts = () => { if (state.page === "catalog" || state.page === "home") renderProducts(); };
+  window._state = state;
+
   async function init() {
     if (!window._sb) { console.error("supabase.js no cargado"); return; }
 
@@ -565,7 +569,15 @@ const CATEGORY_STOCK_IMAGES = {};
     if (product.code) meta.appendChild(el("span", "", `Ref: ${product.code}`));
     body.appendChild(meta);
     const footer = el("div", "product-footer");
-    footer.appendChild(el("strong", "price", formatMoney(product.price)));
+    const clientPrice = typeof window.getClientPrice === "function" ? window.getClientPrice(product) : null;
+    if (clientPrice !== null && clientPrice !== product.price) {
+      const origSpan = el("span", "price-original", formatMoney(product.price));
+      const discSpan = el("strong", "price", formatMoney(clientPrice));
+      footer.appendChild(origSpan);
+      footer.appendChild(discSpan);
+    } else {
+      footer.appendChild(el("strong", "price", formatMoney(product.price)));
+    }
     const button = el("button", "btn-primary", product.available ? "Agregar" : "Consultar");
     button.type = "button";
     button.addEventListener("click", (event) => { event.stopPropagation(); addToCart(product.id); });
@@ -703,7 +715,14 @@ const CATEGORY_STOCK_IMAGES = {};
     info.appendChild(el("p", "product-detail-description", product.description || "Descripción pendiente. Puedes consultar más información por WhatsApp."));
 
     const specs = el("div", "product-detail-specs");
-    specs.appendChild(detailSpec("Precio", formatMoney(product.price)));
+    const clientPriceDetail = typeof window.getClientPrice === "function" ? window.getClientPrice(product) : null;
+    if (clientPriceDetail !== null && clientPriceDetail !== product.price) {
+      const priceNode = document.createElement("div");
+      priceNode.innerHTML = `<span class="price-original">${formatMoney(product.price)}</span><strong>${formatMoney(clientPriceDetail)}</strong>`;
+      specs.appendChild(detailSpec("Precio", "", priceNode));
+    } else {
+      specs.appendChild(detailSpec("Precio", formatMoney(product.price)));
+    }
     if (product.brand) specs.appendChild(detailSpec("Presentación", product.brand));
     specs.appendChild(detailSpec("Referencia", product.code || "No indicada"));
     specs.appendChild(detailSpec("Estado", product.available ? "Disponible" : "Por consultar"));
@@ -763,7 +782,7 @@ const CATEGORY_STOCK_IMAGES = {};
       "Hola, quisiera más información sobre este producto:",
       "",
       `Producto: ${product.name}`,
-      `Precio visto: ${formatMoney(product.price)}`,
+      `Precio visto: ${formatMoney(typeof window.getClientPrice === "function" && window.getClientPrice(product) !== null ? window.getClientPrice(product) : product.price)}`,
       `Presentación: ${product.brand || "Ver en tienda"}`,
       `Referencia: ${product.code || "No indicada"}`,
       "",
@@ -984,7 +1003,7 @@ const CATEGORY_STOCK_IMAGES = {};
     document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
     byId(`page-${page}`)?.classList.add("active");
     button?.classList.add("active");
-    byId("adminPageTitle").textContent = { dashboard:"Dashboard", products:"Productos", categories:"Categorias", excel:"Excel" }[page] || "Dashboard";
+    byId("adminPageTitle").textContent = { dashboard:"Dashboard", products:"Productos", categories:"Categorias", codes:"Códigos cliente", excel:"Excel" }[page] || "Dashboard";
     renderAdmin();
   }
 
@@ -1576,4 +1595,380 @@ const CATEGORY_STOCK_IMAGES = {};
       ticking = true;
     }
   }, { passive: true });
+})();
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HERO CAROUSEL
+// Lee imágenes de assets/hero/ — fallback al logo si no hay ninguna
+// Para agregar imágenes: subí archivos a assets/hero/ (hero1.jpg, hero2.jpg, etc.)
+// ══════════════════════════════════════════════════════════════════════════════
+;(() => {
+  const CAROUSEL_IMAGES = [
+    // Agrega aquí las rutas de tus imágenes en assets/hero/
+    // Si la carpeta no existe aún, se muestra el logo como fallback
+    "assets/logo.png",
+  ];
+
+  // Intenta detectar imágenes en assets/hero/ probando nombres comunes
+  const HERO_CANDIDATES = [
+    "assets/hero/hero1.jpg","assets/hero/hero2.jpg","assets/hero/hero3.jpg",
+    "assets/hero/hero4.jpg","assets/hero/hero5.jpg",
+    "assets/hero/1.jpg","assets/hero/2.jpg","assets/hero/3.jpg",
+    "assets/hero/1.png","assets/hero/2.png","assets/hero/3.png",
+    "assets/hero/foto1.jpg","assets/hero/foto2.jpg","assets/hero/foto3.jpg",
+  ];
+
+  async function probeImages(candidates) {
+    const results = await Promise.allSettled(
+      candidates.map(src => new Promise((res, rej) => {
+        const img = new Image();
+        img.onload  = () => res(src);
+        img.onerror = () => rej();
+        img.src = src;
+      }))
+    );
+    return results.filter(r => r.status === "fulfilled").map(r => r.value);
+  }
+
+  async function initCarousel() {
+    const track = document.getElementById("carouselTrack");
+    const dots  = document.getElementById("carouselDots");
+    const prev  = document.getElementById("carouselPrev");
+    const next  = document.getElementById("carouselNext");
+    if (!track) return;
+
+    // Detectar imágenes disponibles
+    let images = await probeImages(HERO_CANDIDATES);
+    if (!images.length) images = CAROUSEL_IMAGES;
+
+    let current = 0;
+
+    function buildSlides() {
+      track.replaceChildren(...images.map((src, i) => {
+        const slide = document.createElement("div");
+        slide.className = "carousel-slide";
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = `Producto ${i + 1}`;
+        slide.appendChild(img);
+        return slide;
+      }));
+
+      dots.replaceChildren(...images.map((_, i) => {
+        const dot = document.createElement("button");
+        dot.className = "carousel-dot" + (i === 0 ? " active" : "");
+        dot.setAttribute("aria-label", `Imagen ${i + 1}`);
+        dot.addEventListener("click", () => goTo(i));
+        return dot;
+      }));
+
+      // Ocultar botones si solo hay 1 imagen
+      if (images.length <= 1) {
+        prev && (prev.hidden = true);
+        next && (next.hidden = true);
+        dots && (dots.hidden = true);
+      }
+    }
+
+    function goTo(index) {
+      current = (index + images.length) % images.length;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.querySelectorAll(".carousel-dot").forEach((d, i) =>
+        d.classList.toggle("active", i === current)
+      );
+    }
+
+    prev?.addEventListener("click", () => goTo(current - 1));
+    next?.addEventListener("click", () => goTo(current + 1));
+
+    // Autoplay cada 4 segundos
+    let timer = setInterval(() => goTo(current + 1), 4000);
+    document.getElementById("heroCarousel")?.addEventListener("mouseenter", () => clearInterval(timer));
+    document.getElementById("heroCarousel")?.addEventListener("mouseleave", () => {
+      clearInterval(timer);
+      timer = setInterval(() => goTo(current + 1), 4000);
+    });
+
+    // Swipe en touch
+    let startX = 0;
+    track.addEventListener("touchstart", e => { startX = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener("touchend",   e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 40) goTo(current + (dx < 0 ? 1 : -1));
+    });
+
+    buildSlides();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initCarousel);
+  } else {
+    initCarousel();
+  }
+})();
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SISTEMA DE CÓDIGOS DE CLIENTE
+// ══════════════════════════════════════════════════════════════════════════════
+;(() => {
+  // ── Estado del código activo ──────────────────────────────────────────────
+  const CLIENT_CODE_KEY = "fje_client_code";
+  let activeClientCode = null; // { code, label, discount, rules: [{productId, price}] }
+
+  function loadActiveCode() {
+    try { activeClientCode = JSON.parse(localStorage.getItem(CLIENT_CODE_KEY)); } catch { activeClientCode = null; }
+  }
+  function saveActiveCode() {
+    if (activeClientCode) localStorage.setItem(CLIENT_CODE_KEY, JSON.stringify(activeClientCode));
+    else localStorage.removeItem(CLIENT_CODE_KEY);
+  }
+
+  // Exponer para que app.js principal pueda usarla al renderizar precios
+  window.getClientPrice = function(product) {
+    if (!activeClientCode || !product) return null;
+    // 1. Regla específica por producto ID
+    const rule = (activeClientCode.rules || []).find(r => r.productId === product.id);
+    if (rule && rule.price != null) return Number(rule.price);
+    // 2. Descuento global %
+    if (activeClientCode.discount > 0) {
+      return Math.round(product.price * (1 - activeClientCode.discount / 100));
+    }
+    return null;
+  };
+
+  window.getActiveClientCode = () => activeClientCode;
+
+  // ── SUPABASE: cargar/guardar códigos ─────────────────────────────────────
+  async function fetchClientCodes() {
+    if (!window._sb) return [];
+    const { data, error } = await window._sb.from("client_codes").select("*").order("code");
+    if (error) { console.error("Error cargando códigos:", error); return []; }
+    return data || [];
+  }
+
+  async function upsertClientCode(codeObj) {
+    const { error } = await window._sb.from("client_codes")
+      .upsert({ code: codeObj.code.toUpperCase(), label: codeObj.label, discount: codeObj.discount || 0, rules: codeObj.rules || [] }, { onConflict: "code" });
+    if (error) throw error;
+  }
+
+  async function deleteClientCode(code) {
+    const { error } = await window._sb.from("client_codes").delete().eq("code", code);
+    if (error) throw error;
+  }
+
+  async function lookupCode(rawCode) {
+    if (!window._sb) return null;
+    const code = rawCode.trim().toUpperCase();
+    const { data } = await window._sb.from("client_codes").select("*").eq("code", code).maybeSingle();
+    return data;
+  }
+
+  // ── UI TIENDA: barra de código ───────────────────────────────────────────
+  function initClientCodeBar() {
+    const bar    = document.getElementById("clientCodeBar");
+    const input  = document.getElementById("clientCodeInput");
+    const apply  = document.getElementById("clientCodeApply");
+    const status = document.getElementById("clientCodeStatus");
+    if (!bar) return;
+
+    loadActiveCode();
+    renderCodeStatus();
+
+    apply?.addEventListener("click", async () => {
+      const raw = input?.value?.trim();
+      if (!raw) return;
+      apply.textContent = "…";
+      apply.disabled = true;
+      const found = await lookupCode(raw);
+      apply.textContent = "Aplicar";
+      apply.disabled = false;
+      if (!found) {
+        toast("Código no válido.", "error");
+        return;
+      }
+      activeClientCode = { code: found.code, label: found.label, discount: found.discount || 0, rules: found.rules || [] };
+      saveActiveCode();
+      renderCodeStatus();
+      // Re-renderizar precios
+      if (typeof window._rerenderPrices === "function") window._rerenderPrices();
+      toast(`Código ${found.code} aplicado. ¡Precios especiales activos!`, "success");
+    });
+
+    input?.addEventListener("keydown", e => { if (e.key === "Enter") apply?.click(); });
+
+    function renderCodeStatus() {
+      if (!status) return;
+      if (!activeClientCode) { status.innerHTML = ""; bar.querySelector("input") && (bar.style.display = ""); return; }
+      // Ocultar el input y mostrar badge
+      bar.style.display = "none";
+      status.innerHTML = `
+        <div class="client-code-badge">
+          <span>Código: <strong>${activeClientCode.code}</strong>${activeClientCode.label ? ` · ${activeClientCode.label}` : ""}${activeClientCode.discount ? ` · ${activeClientCode.discount}% desc.` : ""}</span>
+          <button id="removeCodeBtn" title="Quitar código">✕</button>
+        </div>`;
+      document.getElementById("removeCodeBtn")?.addEventListener("click", () => {
+        activeClientCode = null;
+        saveActiveCode();
+        bar.style.display = "";
+        if (input) input.value = "";
+        renderCodeStatus();
+        if (typeof window._rerenderPrices === "function") window._rerenderPrices();
+        toast("Código eliminado. Viendo precios normales.", "info");
+      });
+    }
+  }
+
+  // ── UI ADMIN: tabla y dialog de códigos ─────────────────────────────────
+  let adminCodes = [];
+  let editingCode = null; // código que se está editando (string) o null para nuevo
+  let draftRules  = [];   // [{productId, productName, price}]
+
+  async function renderCodesTable() {
+    const body = document.getElementById("codesTableBody");
+    if (!body) return;
+    adminCodes = await fetchClientCodes();
+    if (!adminCodes.length) {
+      body.innerHTML = `<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:20px">No hay códigos aún.</td></tr>`;
+      return;
+    }
+    body.replaceChildren(...adminCodes.map(c => {
+      const row = document.createElement("tr");
+      const rulesCount = (c.rules || []).length;
+      row.innerHTML = `
+        <td><strong>${c.code}</strong></td>
+        <td>${c.label || "—"}</td>
+        <td>${c.discount > 0 ? "Descuento %" : rulesCount > 0 ? "Precios fijos" : "Sin descuento"}</td>
+        <td>${c.discount > 0 ? `${c.discount}%` : "—"}</td>
+        <td>${rulesCount > 0 ? `${rulesCount} regla${rulesCount > 1 ? "s" : ""}` : "—"}</td>
+        <td></td>`;
+      const actions = row.cells[5];
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn-muted";
+      editBtn.textContent = "Editar";
+      editBtn.style.marginRight = "6px";
+      editBtn.addEventListener("click", () => openCodeDialog(c));
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn-muted";
+      delBtn.textContent = "Eliminar";
+      delBtn.addEventListener("click", async () => {
+        if (!confirm(`¿Eliminar el código ${c.code}?`)) return;
+        try { await deleteClientCode(c.code); await renderCodesTable(); toast("Código eliminado."); }
+        catch { toast("Error al eliminar.", "error"); }
+      });
+      actions.append(editBtn, delBtn);
+      return row;
+    }));
+  }
+
+  function openCodeDialog(existing = null) {
+    editingCode = existing?.code || null;
+    draftRules  = existing ? JSON.parse(JSON.stringify(existing.rules || [])) : [];
+
+    const dialog = document.getElementById("codeDialog");
+    if (!dialog) return;
+
+    document.getElementById("codeDialogTitle").textContent = existing ? "Editar código" : "Nuevo código";
+    document.getElementById("codeInput").value        = existing?.code || "";
+    document.getElementById("codeInput").disabled     = !!existing; // no editar PK
+    document.getElementById("codeLabelInput").value   = existing?.label || "";
+    document.getElementById("codeDiscountInput").value = existing?.discount || "";
+
+    renderRulesGrid();
+    dialog.showModal();
+  }
+
+  function renderRulesGrid() {
+    const grid = document.getElementById("codeRulesGrid");
+    if (!grid) return;
+    const products = window._adminProducts || [];
+    grid.replaceChildren(...draftRules.map((rule, i) => {
+      const row = document.createElement("div");
+      row.className = "code-rule-row";
+
+      // Selector de producto
+      const sel = document.createElement("select");
+      products.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = `${p.name} (${p.brand || "sin presentación"})`;
+        if (p.id === rule.productId) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener("change", () => { draftRules[i].productId = sel.value; });
+
+      // Precio fijo
+      const priceInput = document.createElement("input");
+      priceInput.type = "number"; priceInput.min = "0"; priceInput.placeholder = "Precio (₡)";
+      priceInput.value = rule.price ?? "";
+      priceInput.addEventListener("input", () => { draftRules[i].price = Number(priceInput.value); });
+
+      // Botón eliminar
+      const del = document.createElement("button");
+      del.className = "btn-muted"; del.textContent = "✕"; del.style.padding = "4px 8px";
+      del.addEventListener("click", () => { draftRules.splice(i, 1); renderRulesGrid(); });
+
+      row.append(sel, priceInput, del);
+      return row;
+    }));
+  }
+
+  function bindAdminCodeEvents() {
+    document.getElementById("newCodeButton")?.addEventListener("click", () => openCodeDialog(null));
+
+    document.getElementById("addRuleButton")?.addEventListener("click", () => {
+      const products = window._adminProducts || [];
+      draftRules.push({ productId: products[0]?.id || "", price: "" });
+      renderRulesGrid();
+    });
+
+    document.getElementById("saveCodeButton")?.addEventListener("click", async () => {
+      const code     = document.getElementById("codeInput")?.value?.trim().toUpperCase();
+      const label    = document.getElementById("codeLabelInput")?.value?.trim();
+      const discount = Number(document.getElementById("codeDiscountInput")?.value || 0);
+      if (!code) { toast("El código es obligatorio.", "error"); return; }
+      try {
+        await upsertClientCode({ code, label, discount, rules: draftRules.filter(r => r.productId) });
+        document.getElementById("codeDialog")?.close();
+        await renderCodesTable();
+        toast("Código guardado.");
+      } catch(e) {
+        toast("Error al guardar: " + e.message, "error");
+      }
+    });
+  }
+
+  // ── Arranque ──────────────────────────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", () => {
+    const page = document.body.dataset.page;
+    if (page === "catalog") {
+      initClientCodeBar();
+    }
+    if (page === "admin") {
+      bindAdminCodeEvents();
+      // Hook en showAdminPage para cargar códigos al navegar a esa pestaña
+      const origShow = window._showAdminPage;
+      // Escuchar clicks en el nav del admin
+      document.querySelector(".admin-nav")?.addEventListener("click", async e => {
+        const btn = e.target.closest("[data-admin-page]");
+        if (btn?.dataset.adminPage === "codes") {
+          // Exponer productos para el selector de reglas
+          window._adminProducts = window._state?.products || [];
+          await renderCodesTable();
+        }
+      });
+    }
+  });
+
+  // Re-renderizar función para que app.js la llame tras aplicar código
+  window._rerenderPrices = function() {
+    // Busca todos los elementos de precio en el catálogo y los actualiza
+    document.querySelectorAll("[data-product-id]").forEach(card => {
+      const id = card.dataset.productId;
+      // Trigger re-render si existe la función principal
+      // (se hace recargando el renderProducts que ya aplica getClientPrice)
+    });
+    // La forma más limpia: si renderProducts está expuesta, llamarla
+    if (typeof window._renderProducts === "function") window._renderProducts();
+  };
 })();

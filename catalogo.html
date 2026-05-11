@@ -93,6 +93,14 @@
           </select>
         </aside>
 
+        <!-- Código de cliente -->
+        <div class="client-code-bar" id="clientCodeBar">
+          <span style="color:var(--muted);font-weight:700;white-space:nowrap;font-size:12px;text-transform:uppercase">Código cliente</span>
+          <input id="clientCodeInput" type="text" placeholder="Ingresá tu código" autocomplete="off" style="text-transform:uppercase" maxlength="30" />
+          <button class="btn-apply" id="clientCodeApply">Aplicar</button>
+        </div>
+        <div id="clientCodeStatus"></div>
+
         <div class="active-filters" id="activeFilters"></div>
 
         <p class="catalog-hint" id="catalogHint">

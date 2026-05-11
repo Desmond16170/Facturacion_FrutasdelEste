@@ -2284,3 +2284,175 @@ td {
     padding-bottom: 8px;
   }
 }
+
+/* ══════════════════════════════════════════════════════
+   HERO CAROUSEL
+══════════════════════════════════════════════════════ */
+.hero-carousel {
+  position: relative;
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+.carousel-track {
+  display: flex;
+  height: 100%;
+  min-height: 340px;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel-slide {
+  flex: 0 0 100%;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.carousel-slide img {
+  width: min(100%, 320px);
+  height: 100%;
+  max-height: 290px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 24px 38px rgba(0,0,0,0.42));
+  border-radius: 8px;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(17, 41, 24, 0.7);
+  border: 1px solid var(--line-soft);
+  color: var(--text);
+  font-size: 28px;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 2;
+  padding: 0;
+}
+.carousel-btn:hover { background: rgba(17, 41, 24, 0.95); }
+.carousel-prev { left: 10px; }
+.carousel-next { right: 10px; }
+
+.carousel-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+.carousel-dot.active {
+  background: var(--gold, #e8b84b);
+  transform: scale(1.3);
+}
+
+/* ══════════════════════════════════════════════════════
+   CÓDIGO DE CLIENTE — barra flotante en tienda
+══════════════════════════════════════════════════════ */
+.client-code-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface, #112918);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.client-code-bar input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 13px;
+}
+.client-code-bar input::placeholder { color: var(--muted); }
+.client-code-bar .btn-apply {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--muted-2);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.client-code-bar .btn-apply:hover { border-color: var(--muted-2); }
+.client-code-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(42,122,59,0.25);
+  border: 1px solid rgba(42,122,59,0.5);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #7ed99a;
+}
+.client-code-badge button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+}
+.client-code-badge button:hover { opacity: 1; }
+
+/* Precio con descuento */
+.price-original {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: line-through;
+  display: block;
+}
+
+/* ══════════════════════════════════════════════════════
+   ADMIN — pestaña códigos de cliente
+══════════════════════════════════════════════════════ */
+.code-rules-grid {
+  display: grid;
+  gap: 8px;
+}
+.code-rule-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+.code-rule-row input, .code-rule-row select {
+  padding: 6px 8px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+}

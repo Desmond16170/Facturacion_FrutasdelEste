@@ -75,8 +75,13 @@
         </div>
 
         <div class="hero-visual" aria-label="Jugos y Frutas Del Este">
-          <div class="logo-card official-logo-card">
-            <img src="assets/logo.png" alt="Jugos y Frutas Del Este" />
+          <div class="logo-card official-logo-card hero-carousel" id="heroCarousel" aria-label="Galería de productos">
+            <div class="carousel-track" id="carouselTrack">
+              <!-- slides se inyectan por JS -->
+            </div>
+            <button class="carousel-btn carousel-prev" id="carouselPrev" aria-label="Anterior">&#8249;</button>
+            <button class="carousel-btn carousel-next" id="carouselNext" aria-label="Siguiente">&#8250;</button>
+            <div class="carousel-dots" id="carouselDots"></div>
           </div>
           <div class="shop-photo-card">
             <span>Productos naturales</span>
