@@ -129,7 +129,9 @@ const CATEGORY_STOCK_IMAGES = {};
       ]);
       state.products   = normalizeProducts(products || []);
       const dbCats     = (categories || []).map(r => r.name);
-      state.categories = unique([...defaultCategories, ...dbCats, ...state.products.map(p => p.category).filter(Boolean)]);
+      // Solo usamos las categorías de la BD (más las default). No mezclamos con p.category
+      // para que al borrar una categoría vacía no se recree sola desde los productos.
+      state.categories = unique([...defaultCategories, ...dbCats]);
     } else if (state.page === "product") {
       // producto.html carga por ID directo para que no dependa de los destacados iniciales.
       const params = new URLSearchParams(window.location.search);
@@ -1184,7 +1186,10 @@ const CATEGORY_STOCK_IMAGES = {};
   }
 
   async function deleteCategory(category) {
-    if (state.products.some(p => p.category === category)) return;
+    if (state.products.some(p => p.category === category)) {
+      toast("No se puede eliminar: hay productos con esta categoría.", "error");
+      return;
+    }
     try { await removeCategory(category); state.categories = state.categories.filter(c => c !== category); renderAdmin(); }
     catch { toast("Error al eliminar categoria.", "error"); }
   }

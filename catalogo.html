@@ -65,40 +65,32 @@
         </div>
 
         <aside class="filters-panel catalog-filter-bar" aria-label="Filtros del catálogo">
-          <label class="catalog-search-field">
+          <label class="catalog-search-field catalog-search-full">
             Buscar
             <input id="searchInput" type="search" placeholder="Sabor, tipo o presentación" />
           </label>
-          <label>
-            Categoría
-            <select id="categoryFilter"></select>
-          </label>
-          <label>
-            Sabor
-            <select id="brandFilter"></select>
-          </label>
-          <label>
-            Presentación
-            <select id="compatibleFilter"></select>
-          </label>
-          <label>
-            Estado
-            <select id="availabilityFilter">
-              <option value="all">Todos</option>
-              <option value="available">Disponibles</option>
-              <option value="unavailable">No disponibles</option>
-            </select>
-          </label>
-          <label>
-            Ordenar por
-            <select id="sortFilter">
-              <option value="featured">Destacados primero</option>
-              <option value="name">Nombre A-Z</option>
-              <option value="price-asc">Precio menor</option>
-              <option value="price-desc">Precio mayor</option>
-            </select>
-          </label>
-          <button class="btn-muted" type="button" id="clearFiltersButton">Limpiar filtros</button>
+          <div class="filters-row-secondary">
+            <label>
+              Categoría
+              <select id="categoryFilter"></select>
+            </label>
+            <label>
+              Ordenar por
+              <select id="sortFilter">
+                <option value="featured">Destacados primero</option>
+                <option value="name">Nombre A-Z</option>
+                <option value="price-asc">Precio menor</option>
+                <option value="price-desc">Precio mayor</option>
+              </select>
+            </label>
+            <button class="btn-muted" type="button" id="clearFiltersButton">Limpiar filtros</button>
+          </div>
+          <!-- Selectores ocultos mantenidos para compatibilidad con app.js -->
+          <select id="brandFilter" hidden></select>
+          <select id="compatibleFilter" hidden></select>
+          <select id="availabilityFilter" hidden>
+            <option value="all">Todos</option>
+          </select>
         </aside>
 
         <div class="active-filters" id="activeFilters"></div>
