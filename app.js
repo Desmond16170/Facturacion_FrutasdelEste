@@ -1588,33 +1588,18 @@ const CATEGORY_STOCK_IMAGES = {};
   if (header) ro.observe(header);
 })();
 
-// ── Compactar barra de filtros al hacer scroll en móvil ──────────────────────
+// ── Heading compacto en desktop al hacer scroll ──────────────────────────────
+// En móvil (≤680px) el heading es estático (CSS), solo en desktop se recalcula el top del filtro
 (() => {
-  const heading = document.querySelector(".catalog-heading-sticky");
   const filterBar = document.querySelector(".catalog-filter-bar");
-  if (!heading || !filterBar) return;
+  if (!filterBar) return;
 
   let ticking = false;
 
   function applyScrollState() {
-    // Solo aplica el comportamiento compacto en móvil (≤680px)
-    const isMobile = window.innerWidth <= 680;
-    if (!isMobile) {
-      heading.classList.remove("heading-hidden");
+    // En desktop: limpiar clases residuales si las hubiera
+    if (window.innerWidth > 680) {
       filterBar.classList.remove("filter-compact");
-      ticking = false;
-      return;
-    }
-    const scrolled = window.scrollY > 60;
-    const wasHidden = heading.classList.contains("heading-hidden");
-    heading.classList.toggle("heading-hidden", scrolled);
-    filterBar.classList.toggle("filter-compact", scrolled);
-    // Si el heading acaba de mostrarse, recalcular su altura para --heading-h
-    if (wasHidden && !scrolled) {
-      requestAnimationFrame(() => {
-        const h = heading.getBoundingClientRect().height;
-        if (h > 0) document.documentElement.style.setProperty("--heading-h", h + "px");
-      });
     }
     ticking = false;
   }
@@ -1625,8 +1610,6 @@ const CATEGORY_STOCK_IMAGES = {};
       ticking = true;
     }
   }, { passive: true });
-
-  window.addEventListener("resize", applyScrollState);
 })();
 
 // ══════════════════════════════════════════════════════════════════════════════
