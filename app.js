@@ -5,8 +5,8 @@
   // Imágenes: se suben a Cloudinary vía /api/upload-image (ver api/upload-image.js)
 
   const defaultCategories = [
-    "Pulpas congeladas","Galones","Jugos frescos","Combos",
-    "Cítricos","Tropicales","Berries","Especiales",
+    // Las categorías ya no se hardcodean aquí.
+    // Se gestionan 100% desde el admin → pestaña Categorías → Supabase.
   ];
 
   // ─── IMÁGENES STOCK POR CATEGORÍA ────────────────────────────────────────────
@@ -1205,12 +1205,20 @@ const CATEGORY_STOCK_IMAGES = {};
   }
 
   async function deleteCategory(category) {
-    if (state.products.some(p => p.category === category)) {
-      toast("No se puede eliminar: hay productos con esta categoría.", "error");
+    const productsWithCat = state.products.filter(p => p.category === category);
+    if (productsWithCat.length > 0) {
+      toast(`No se puede eliminar "${category}": tiene ${productsWithCat.length} producto(s) asignado(s). Reasignalos primero.`, "error");
       return;
     }
-    try { await removeCategory(category); state.categories = state.categories.filter(c => c !== category); renderAdmin(); }
-    catch { toast("Error al eliminar categoria.", "error"); }
+    if (!confirm(`¿Eliminar la categoría "${category}"?`)) return;
+    try {
+      await removeCategory(category);
+      state.categories = state.categories.filter(c => c !== category);
+      renderAdmin();
+      toast(`Categoría "${category}" eliminada.`, "success");
+    } catch(e) {
+      toast("Error al eliminar: " + (e?.message || "intenta de nuevo"), "error");
+    }
   }
 
   async function toggleAvailability(id) {
