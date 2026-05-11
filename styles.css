@@ -2317,6 +2317,15 @@ td {
   .catalog-hint {
     display: none !important;
   }
+  /* Ocultar todo el wrap al hacer scroll hacia abajo */
+  .catalog-sticky-wrap {
+    transition: transform 0.28s ease, opacity 0.22s ease;
+  }
+  .catalog-sticky-wrap.wrap-hidden {
+    transform: translateY(-110%);
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 
