@@ -1569,6 +1569,13 @@ const CATEGORY_STOCK_IMAGES = {};
     if (!header) return;
     const headerH = header.getBoundingClientRect().height;
     root.style.setProperty("--header-h", headerH + "px");
+
+    // Medir la altura del heading solo cuando NO está oculto
+    const heading = document.querySelector(".catalog-heading-sticky");
+    if (heading && !heading.classList.contains("heading-hidden")) {
+      const headingH = heading.getBoundingClientRect().height;
+      if (headingH > 0) root.style.setProperty("--heading-h", headingH + "px");
+    }
   }
 
   // Ejecutar al cargar y en cada resize
@@ -1587,14 +1594,28 @@ const CATEGORY_STOCK_IMAGES = {};
   const filterBar = document.querySelector(".catalog-filter-bar");
   if (!heading || !filterBar) return;
 
-  let lastScrollY = window.scrollY;
   let ticking = false;
 
   function applyScrollState() {
+    // Solo aplica el comportamiento compacto en móvil (≤680px)
+    const isMobile = window.innerWidth <= 680;
+    if (!isMobile) {
+      heading.classList.remove("heading-hidden");
+      filterBar.classList.remove("filter-compact");
+      ticking = false;
+      return;
+    }
     const scrolled = window.scrollY > 60;
+    const wasHidden = heading.classList.contains("heading-hidden");
     heading.classList.toggle("heading-hidden", scrolled);
     filterBar.classList.toggle("filter-compact", scrolled);
-    lastScrollY = window.scrollY;
+    // Si el heading acaba de mostrarse, recalcular su altura para --heading-h
+    if (wasHidden && !scrolled) {
+      requestAnimationFrame(() => {
+        const h = heading.getBoundingClientRect().height;
+        if (h > 0) document.documentElement.style.setProperty("--heading-h", h + "px");
+      });
+    }
     ticking = false;
   }
 
@@ -1604,6 +1625,8 @@ const CATEGORY_STOCK_IMAGES = {};
       ticking = true;
     }
   }, { passive: true });
+
+  window.addEventListener("resize", applyScrollState);
 })();
 
 // ══════════════════════════════════════════════════════════════════════════════
