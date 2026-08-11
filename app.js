@@ -1,7 +1,7 @@
 (function () {
   // ─── CONSTANTES ─────────────────────────────────────────────────────────────
   const CART_KEY       = "jf_cart";
-  const WA_NUMBER      = "50662253122";
+  const WA_NUMBER      = "50660159597";
   // Imágenes: se suben a Cloudinary vía /api/upload-image (ver api/upload-image.js)
 
   const defaultCategories = [
