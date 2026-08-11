@@ -441,8 +441,8 @@ const CATEGORY_STOCK_IMAGES = {};
       hint.hidden = false;
       hint.style.display = "";
       hint.textContent = hasProducts
-        ? "Te mostramos algunos destacados. También podés buscar por nombre, marca, código o vehículo."
-        : "Buscá por nombre, marca, código o vehículo. El catálogo se carga según tu búsqueda para mostrar resultados más rápido.";
+        ? "Te mostramos algunos destacados. También podés buscar por nombre"
+        : "";
     } else {
       hint.hidden = true;
       hint.style.display = "none";
